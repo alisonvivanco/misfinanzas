@@ -30,9 +30,12 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
   return (
     <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card/50 backdrop-blur-sm">
       <div className="p-6 border-b">
-        <Link href="/" className="flex items-baseline gap-1">
-          <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
-          <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" />
+          <div className="flex items-baseline gap-1 leading-none">
+            <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
+            <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
+          </div>
         </Link>
       </div>
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
