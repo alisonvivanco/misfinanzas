@@ -48,12 +48,13 @@ const BudgetSchema = new Schema<IBudget>(
     },
     categorias: [
       {
-        nombre: String,
+        nombre: { type: String, required: true, trim: true },
         tipoRegla: {
           type: String,
           enum: ["necesidades", "deseos", "ahorros"],
+          required: true,
         },
-        montoAsignado: Number,
+        montoAsignado: { type: Number, required: true, min: 0 },
       },
     ],
     cerrado: { type: Boolean, default: false },

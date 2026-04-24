@@ -62,13 +62,18 @@ const BoletaSchema = new Schema<IBoleta>(
 BoletaSchema.index({ userId: 1, anio: 1, mes: 1 });
 BoletaSchema.index({ userId: 1, fechaEmision: -1 });
 
-// Hook: calcular retención y líquido antes de guardar
-BoletaSchema.pre("save", function (next) {
-  this.montoRetencion = Math.round(this.montoBruto * this.porcentajeRetencion);
-  this.montoLiquido = this.montoBruto - this.montoRetencion;
-  const fecha = this.fechaEmision;
-  this.mes = fecha.getMonth() + 1;
-  this.anio = fecha.getFullYear();
+// Calcula retención, líquido, mes y anio antes de validar.
+// Debe ser pre('validate') porque montoRetencion/montoLiquido/mes/anio
+// están marcados required y la validación corre antes de pre('save').
+BoletaSchema.pre("validate", function (next) {
+  if (this.fechaEmision) {
+    this.mes = this.fechaEmision.getMonth() + 1;
+    this.anio = this.fechaEmision.getFullYear();
+  }
+  if (typeof this.montoBruto === "number" && typeof this.porcentajeRetencion === "number") {
+    this.montoRetencion = Math.round(this.montoBruto * this.porcentajeRetencion);
+    this.montoLiquido = this.montoBruto - this.montoRetencion;
+  }
   next();
 });
 
