@@ -35,7 +35,7 @@ export default async function CotizacionesPage() {
       afp: acc.afp + m.afp,
       salud: acc.salud + m.salud,
       sis: acc.sis + m.sis,
-      accidente: acc.accidenteTrabajo + m.accidenteTrabajo,
+      accidente: acc.accidente + m.accidenteTrabajo,
       total: acc.total + m.total,
     }),
     { bruto: 0, base: 0, afp: 0, salud: 0, sis: 0, accidente: 0, total: 0 }
