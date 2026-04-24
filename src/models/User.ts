@@ -3,16 +3,18 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IUser extends Document {
   email: string;
   password?: string;
-  nombre: string;
-  apellido: string;
-  rut: string; // formato: "12345678-9"
-  telefono: string;
+  image?: string;
+  nombre?: string;
+  apellido?: string;
+  rut?: string; // formato: "12345678-9"
+  telefono?: string;
   emailVerified: Date | null;
   verificationToken?: string;
   verificationTokenExpires?: Date;
   resetToken?: string;
   resetTokenExpires?: Date;
-  tipoIngreso: "dependiente" | "honorarios" | "mixto" | "negocio";
+  tipoIngreso?: "dependiente" | "honorarios" | "mixto" | "negocio";
+  profileComplete: boolean;
   plan: "trial" | "free" | "premium" | "pro";
   trialEndsAt?: Date;
   subscribedUntil?: Date;
@@ -45,10 +47,11 @@ const UserSchema = new Schema<IUser>(
       index: true,
     },
     password: { type: String, select: false },
-    nombre: { type: String, required: true, trim: true },
-    apellido: { type: String, required: true, trim: true },
-    rut: { type: String, required: true, unique: true, index: true },
-    telefono: { type: String, required: true },
+    image: { type: String },
+    nombre: { type: String, trim: true },
+    apellido: { type: String, trim: true },
+    rut: { type: String },
+    telefono: { type: String },
     emailVerified: { type: Date, default: null },
     verificationToken: { type: String, select: false },
     verificationTokenExpires: { type: Date, select: false },
@@ -59,6 +62,7 @@ const UserSchema = new Schema<IUser>(
       enum: ["dependiente", "honorarios", "mixto", "negocio"],
       default: "honorarios",
     },
+    profileComplete: { type: Boolean, default: false, index: true },
     plan: {
       type: String,
       enum: ["trial", "free", "premium", "pro"],
@@ -84,8 +88,11 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-UserSchema.index({ rut: 1 });
-UserSchema.index({ email: 1 });
+// rut is optional (Google OAuth users fill it in /completar-perfil). Unique only when present.
+UserSchema.index(
+  { rut: 1 },
+  { unique: true, partialFilterExpression: { rut: { $type: "string" } } }
+);
 
 export const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>("User", UserSchema);

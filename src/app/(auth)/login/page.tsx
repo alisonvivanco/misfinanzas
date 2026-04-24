@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export default function LoginPage() {
   return (
@@ -52,6 +53,17 @@ function LoginForm() {
       <div className="space-y-1.5">
         <h1 className="text-2xl font-bold">Bienvenida de vuelta</h1>
         <p className="text-sm text-muted-foreground">Ingresa a tu cuenta de MisFinanzas.</p>
+      </div>
+
+      <GoogleButton callbackUrl={redirect} />
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">o con email</span>
+        </div>
       </div>
 
       <div className="space-y-1.5">

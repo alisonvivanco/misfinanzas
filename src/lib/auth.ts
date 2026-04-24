@@ -4,7 +4,9 @@
  */
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import clientPromise, { dbConnect } from "./mongodb";
 import { User } from "@/models/User";
@@ -44,11 +46,72 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return {
           id: user._id.toString(),
           email: user.email,
-          name: `${user.nombre} ${user.apellido}`,
+          name: [user.nombre, user.apellido].filter(Boolean).join(" ") || user.email,
           rut: user.rut,
           plan: user.plan,
+          profileComplete: user.profileComplete ?? Boolean(user.rut && user.telefono),
         };
       },
     }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
+  events: {
+    // First-time OAuth signup: split Google's `name` into nombre/apellido and
+    // set a 14-day trial. `profileComplete` stays false so the dashboard
+    // layout redirects the user to /completar-perfil to capture RUT + phone.
+    async createUser({ user }) {
+      await dbConnect();
+      const parts = (user.name || "").trim().split(/\s+/);
+      const nombre = parts[0] || "";
+      const apellido = parts.slice(1).join(" ") || "";
+      const trialDays = Number(process.env.FREE_TRIAL_DAYS || 14);
+      await User.updateOne(
+        { _id: new ObjectId(user.id as string) },
+        {
+          $set: {
+            nombre,
+            apellido,
+            profileComplete: false,
+            plan: "trial",
+            trialEndsAt: new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000),
+          },
+        }
+      );
+    },
+  },
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user, trigger, session, account }) {
+      // Google OAuth: hydrate token from DB on first sign-in because the
+      // adapter's `user` object only carries name/email/image.
+      if (user && account?.provider === "google") {
+        await dbConnect();
+        const dbUser = await User.findById(user.id).lean();
+        token.id = user.id;
+        token.rut = dbUser?.rut;
+        token.plan = dbUser?.plan ?? "trial";
+        token.profileComplete = dbUser?.profileComplete ?? false;
+        return token;
+      }
+      // Credentials sign-in: user object carries everything we need.
+      if (user) {
+        token.id = user.id;
+        token.rut = (user as { rut?: string }).rut;
+        token.plan = (user as { plan?: string }).plan;
+        token.profileComplete = (user as { profileComplete?: boolean }).profileComplete;
+      }
+      if (trigger === "update" && session) {
+        if (typeof session.profileComplete === "boolean") {
+          token.profileComplete = session.profileComplete;
+        }
+        if (typeof session.rut === "string") token.rut = session.rut;
+        if (typeof session.plan === "string") token.plan = session.plan;
+      }
+      return token;
+    },
+  },
 });

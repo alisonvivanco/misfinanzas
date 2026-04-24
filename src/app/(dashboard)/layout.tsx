@@ -10,6 +10,7 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  if (session.user.profileComplete === false) redirect("/completar-perfil");
 
   return (
     <SessionProvider session={session}>
