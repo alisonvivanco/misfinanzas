@@ -68,7 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const parts = (user.name || "").trim().split(/\s+/);
       const nombre = parts[0] || "";
       const apellido = parts.slice(1).join(" ") || "";
-      const trialDays = Number(process.env.FREE_TRIAL_DAYS || 14);
+      const trialDays = Number(process.env.FREE_TRIAL_DAYS || 1);
       await User.updateOne(
         { _id: new ObjectId(user.id as string) },
         {

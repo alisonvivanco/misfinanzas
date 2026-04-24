@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SUBSCRIBE_URL } from "@/lib/subscription";
 import { ArrowRight, Check, FileText, PieChart, Shield, TrendingUp, Wallet, Zap } from "lucide-react";
 
 export default function LandingPage() {
@@ -14,12 +15,11 @@ export default function LandingPage() {
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition">Características</Link>
-            <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition">Precios</Link>
-            <Link href="#faq" className="text-muted-foreground hover:text-foreground transition">FAQ</Link>
+            <a href={SUBSCRIBE_URL} className="text-muted-foreground hover:text-foreground transition">Suscribirse</a>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
-            <Link href="/signup"><Button variant="gradient" size="sm">Empezar gratis</Button></Link>
+            <Link href="/signup"><Button variant="gradient" size="sm">Probar 1 día</Button></Link>
           </div>
         </div>
       </header>
@@ -43,16 +43,16 @@ export default function LandingPage() {
             <div className="flex flex-wrap gap-3 justify-center pt-4">
               <Link href="/signup">
                 <Button variant="gradient" size="lg" className="gap-2">
-                  Comenzar prueba de 14 días
+                  Probar 1 día gratis
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="#features">
-                <Button variant="outline" size="lg">Ver características</Button>
-              </Link>
+              <a href={SUBSCRIBE_URL}>
+                <Button variant="outline" size="lg">Suscribirse</Button>
+              </a>
             </div>
             <div className="pt-8 flex items-center justify-center gap-6 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5"><Check className="h-4 w-4 text-income" />Sin tarjeta</div>
+              <div className="flex items-center gap-1.5"><Check className="h-4 w-4 text-income" />1 día de prueba</div>
               <div className="flex items-center gap-1.5"><Check className="h-4 w-4 text-income" />Datos en Chile</div>
               <div className="flex items-center gap-1.5"><Check className="h-4 w-4 text-income" />Cancela cuando quieras</div>
             </div>
@@ -86,13 +86,20 @@ export default function LandingPage() {
         <div className="rounded-3xl bg-gradient-to-br from-primary via-violet-600 to-fuchsia-600 p-12 md:p-16 text-white text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-4">Empieza a controlar tu dinero hoy</h2>
           <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-            14 días gratis · Sin compromisos · Soporte en español
+            Prueba 1 día gratis · Cancela cuando quieras · Soporte en español
           </p>
-          <Link href="/signup">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90">
-              Crear cuenta gratis <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/signup">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 gap-2">
+                Probar 1 día gratis <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <a href={SUBSCRIBE_URL}>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                Suscribirse
+              </Button>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -107,7 +114,7 @@ const FEATURES = [
   {
     Icon: FileText,
     title: "Boletas de honorarios",
-    desc: "Emite, organiza y provisiona la retención 2026 (15,25%) automáticamente. Reporte listo para Operación Renta.",
+    desc: "Emite, organiza y provisiona la retención 2026 (15,25%) automáticamente. Tu impuesto anual al día.",
   },
   {
     Icon: Shield,
@@ -132,6 +139,6 @@ const FEATURES = [
   {
     Icon: Zap,
     title: "Impuesto Único al día",
-    desc: "Cálculo automático de IU 2da Categoría con tramos SII actualizados. Proyección de Operación Renta.",
+    desc: "Cálculo automático de IU 2da Categoría con tramos SII actualizados. Proyección de tu impuesto anual.",
   },
 ];

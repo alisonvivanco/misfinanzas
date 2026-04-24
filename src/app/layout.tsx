@@ -13,9 +13,7 @@ export const metadata: Metadata = {
     "boletas honorarios",
     "cotizaciones AFP",
     "presupuesto 50/30/20",
-    "operación renta",
     "APV",
-    "SII",
   ],
   authors: [{ name: "Alison Vivanco" }],
   openGraph: {

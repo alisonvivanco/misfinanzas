@@ -81,7 +81,7 @@ export default function CompletarPerfilPage() {
         />
         {errors.rut && <p className="text-xs text-destructive">{errors.rut.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Usamos tu RUT para integrarnos con el SII vía Clave Única (próximamente).
+          Usamos tu RUT para identificarte y calcular correctamente tus impuestos.
         </p>
       </div>
 

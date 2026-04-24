@@ -170,10 +170,10 @@ export function ufACLP(montoUF: number, valorUF: number): number {
 }
 
 // ============================================
-// Provisión Operación Renta
-// Estima cuánto debería provisionar del líquido
+// Provisión de impuesto anual
+// Estima cuánto debería provisionar del líquido para el impuesto anual
 // ============================================
-export function provisionOperacionRenta(
+export function provisionImpuestoAnual(
   brutoAnual: number,
   valorUTM: number,
   cotizacionesPagadas: number

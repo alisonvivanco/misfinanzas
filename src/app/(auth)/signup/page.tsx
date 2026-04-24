@@ -94,7 +94,7 @@ export default function SignupPage() {
       <div className="space-y-1.5">
         <h1 className="text-2xl font-bold">Crear cuenta</h1>
         <p className="text-sm text-muted-foreground">
-          14 días de prueba gratis. Sin tarjeta.
+          1 día de prueba gratis. Cancela cuando quieras.
         </p>
       </div>
 
@@ -136,7 +136,7 @@ export default function SignupPage() {
         />
         {errors.rut && <p className="text-xs text-destructive">{errors.rut.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Usamos tu RUT para integrarnos con el SII vía Clave Única (próximamente).
+          Usamos tu RUT para identificarte y calcular correctamente tus impuestos.
         </p>
       </div>
 

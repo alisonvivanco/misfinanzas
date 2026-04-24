@@ -2,9 +2,11 @@ import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { getIndicadores } from "@/lib/uf";
-import { formatCLP, formatPct, tasaRetencionHonorarios } from "@/lib/chile-tax";
+import { formatPct, tasaRetencionHonorarios } from "@/lib/chile-tax";
+import { SUBSCRIBE_URL, MANAGE_SUBSCRIPTION_URL } from "@/lib/subscription";
 import { KPICard } from "@/components/dashboard/kpi-card";
-import { Settings, DollarSign, Shield, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DollarSign, Shield, Calendar, Sparkles, ExternalLink } from "lucide-react";
 
 export default async function ConfiguracionPage() {
   const session = await auth();
@@ -56,18 +58,20 @@ export default async function ConfiguracionPage() {
         </div>
         <div className="p-5 grid md:grid-cols-2 gap-5">
           <Info label="Nombre" value={`${user.nombre} ${user.apellido}`} />
-          <Info label="RUT" value={user.rut} />
+          <Info label="RUT" value={user.rut || "—"} />
           <Info label="Email" value={user.email} />
-          <Info label="Teléfono" value={user.telefono} />
+          <Info label="Teléfono" value={user.telefono || "—"} />
           <Info
             label="Tipo de ingreso"
             value={
-              {
-                honorarios: "Honorarios Independiente",
-                dependiente: "Sueldo Dependiente",
-                mixto: "Mixto",
-                negocio: "Negocio propio",
-              }[user.tipoIngreso] || user.tipoIngreso
+              user.tipoIngreso
+                ? {
+                    honorarios: "Honorarios Independiente",
+                    dependiente: "Sueldo Dependiente",
+                    mixto: "Mixto",
+                    negocio: "Negocio propio",
+                  }[user.tipoIngreso] || user.tipoIngreso
+                : "—"
             }
           />
           <Info
@@ -113,16 +117,37 @@ export default async function ConfiguracionPage() {
         </div>
       </div>
 
-      <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-4 text-sm text-amber-900 dark:text-amber-200">
-        <div className="flex items-start gap-2">
-          <Settings className="h-4 w-4 mt-0.5 shrink-0" />
-          <div>
-            <div className="font-medium mb-1">Integración SII · Clave Única (próximamente)</div>
-            <p className="text-xs leading-relaxed">
-              Estamos trabajando en la integración OAuth con Clave Única del Estado
-              para sincronizar automáticamente tus boletas desde el SII, generar tu
-              Operación Renta pre-llenada y descargar certificados tributarios.
-            </p>
+      {/* Suscripción */}
+      <div className="rounded-2xl border bg-card overflow-hidden">
+        <div className="p-5 border-b">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            Suscripción
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            {user.plan === "trial"
+              ? `Estás en periodo de prueba${user.trialEndsAt ? ` hasta el ${new Date(user.trialEndsAt).toLocaleDateString("es-CL")}` : ""}.`
+              : `Plan actual: ${user.plan}`}
+          </p>
+        </div>
+        <div className="p-5 space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Suscríbete para mantener todas tus funcionalidades activas.
+            Pago mensual vía MercadoPago. Puedes cancelar cuando quieras.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a href={SUBSCRIBE_URL} target="_blank" rel="noreferrer">
+              <Button variant="gradient" className="gap-2">
+                Suscribirse
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </a>
+            <a href={MANAGE_SUBSCRIPTION_URL} target="_blank" rel="noreferrer">
+              <Button variant="outline" className="gap-2">
+                Cancelar / gestionar
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </a>
           </div>
         </div>
       </div>

@@ -65,7 +65,10 @@ En Project Settings → Environment Variables, pega todo desde `.env.example`:
 | `NEXT_PUBLIC_APP_URL` | `https://misfinanzas.alisonvivanco.cl` |
 | `RESEND_API_KEY` | Key de Resend (paso 3) |
 | `EMAIL_FROM` | `MisFinanzas <no-responder@misfinanzas.alisonvivanco.cl>` |
-| `FREE_TRIAL_DAYS` | `14` |
+| `AUTH_GOOGLE_ID` | Client ID del OAuth de Google Cloud |
+| `AUTH_GOOGLE_SECRET` | Client Secret del OAuth de Google Cloud |
+| `NEXT_PUBLIC_SUBSCRIBE_URL` | Link MercadoPago Preapproval (ya hay default en código) |
+| `FREE_TRIAL_DAYS` | `1` |
 
 ### Dominio
 1. Project → Settings → Domains → **Add** `misfinanzas.alisonvivanco.cl`
@@ -97,19 +100,16 @@ Esperar propagación DNS (5-60 min) y verificar en Vercel.
 - [ ] Verificar dominio en Resend (obligatorio para emails reales)
 - [ ] Crear página `/forgot` (recuperación de contraseña)
 - [ ] Crear formularios para Deudas/Ahorros/Inversiones
-- [ ] Integrar Webpay Plus (Transbank) para cobros
-- [ ] Solicitar registro OAuth ante SII para Clave Única
+- [ ] Webhook de MercadoPago para reflejar suscripción en `User.subscribedUntil`
 - [ ] Añadir observabilidad (Sentry, Axiom, o Vercel Analytics)
 - [ ] Backup automático de MongoDB (Atlas ofrece continuous backups en planes pagos)
 
-## 7. Planes sugeridos (monetización)
+## 7. Planes (monetización)
 
 | Plan | Precio CLP/mes | Límites |
 |------|----------------|---------|
-| **Trial** | Gratis 14 días | Todo habilitado |
-| **Free** | $0 | 10 boletas/mes, sin export |
-| **Premium** | $4.990 | Ilimitado + export PDF |
-| **Pro** | $9.990 | Premium + integración SII + asesoría |
+| **Trial** | Gratis 1 día | Todo habilitado |
+| **Suscripción** | Según plan en MercadoPago | Acceso completo, cancela cuando quieras |
 
 ## 8. Monitoreo mínimo
 
