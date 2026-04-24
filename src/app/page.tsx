@@ -8,12 +8,9 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" />
-            <div className="flex items-baseline gap-1 leading-none">
-              <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
-              <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
-            </div>
+          <Link href="/" className="flex items-baseline gap-1">
+            <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
+            <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition">Características</Link>
