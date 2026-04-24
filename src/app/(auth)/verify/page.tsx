@@ -1,11 +1,19 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle, Mail } from "lucide-react";
 
 export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>}>
+      <VerifyContent />
+    </Suspense>
+  );
+}
+
+function VerifyContent() {
   const params = useSearchParams();
   const token = params.get("token");
   const [state, setState] = useState<"loading" | "success" | "error" | "idle">(
