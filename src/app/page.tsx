@@ -8,9 +8,9 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary via-violet-600 to-fuchsia-600" />
-            <span className="font-bold text-lg">MisFinanzas</span>
+          <Link href="/" className="flex items-baseline gap-1">
+            <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
+            <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition">Características</Link>
