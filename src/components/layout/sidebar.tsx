@@ -30,9 +30,9 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
   return (
     <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card/50 backdrop-blur-sm">
       <div className="p-6 border-b">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary via-violet-600 to-fuchsia-600" />
-          <span className="font-bold text-lg">MisFinanzas</span>
+        <Link href="/" className="flex items-baseline gap-1">
+          <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
+          <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
         </Link>
       </div>
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">

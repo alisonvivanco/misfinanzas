@@ -100,12 +100,12 @@ export default function SignupPage() {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="nombre">Nombre</Label>
-          <Input id="nombre" {...register("nombre")} placeholder="Alison" />
+          <Input id="nombre" {...register("nombre")} placeholder="María" />
           {errors.nombre && <p className="text-xs text-destructive">{errors.nombre.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="apellido">Apellido</Label>
-          <Input id="apellido" {...register("apellido")} placeholder="Vivanco" />
+          <Input id="apellido" {...register("apellido")} placeholder="González" />
           {errors.apellido && <p className="text-xs text-destructive">{errors.apellido.message}</p>}
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function SignupPage() {
 
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" {...register("email")} placeholder="alison@ejemplo.cl" />
+        <Input id="email" type="email" {...register("email")} placeholder="tu@ejemplo.cl" />
         {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
       </div>
 
