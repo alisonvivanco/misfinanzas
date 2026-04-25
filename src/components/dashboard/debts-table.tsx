@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn } from "./table-shell";
+import { apiCall, parseMonto } from "./api-call";
 import type { Debt } from "./types";
 
 export function DebtsTable({
@@ -14,61 +16,66 @@ export function DebtsTable({
   const totalPagado = items.reduce((s, i) => s + i.pagado, 0);
 
   async function add() {
-    const m = parseInt(monto.replace(/\D/g, ""), 10);
-    if (!descripcion.trim() || !m || m <= 0) return;
+    const m = parseMonto(monto);
+    if (!descripcion.trim()) { toast.error("Falta la descripción"); return; }
+    if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
-    await fetch("/api/debts", {
+    const ok = await apiCall("/api/debts", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ descripcion: descripcion.trim(), monto: m }),
+      body: { descripcion: descripcion.trim(), monto: m },
     });
-    setDescripcion(""); setMonto("");
     setLoading(false);
-    onChange();
+    if (ok) {
+      setDescripcion(""); setMonto("");
+      toast.success("Deuda agregada");
+      onChange();
+    }
   }
 
-  async function updatePagado(id: string, v: string, monto: number) {
-    const m = parseInt(v.replace(/\D/g, ""), 10) || 0;
-    const saldada = m >= monto;
-    await fetch(`/api/debts?id=${id}`, {
+  async function updatePagado(id: string, v: string, monto: number, current: number) {
+    const m = parseMonto(v);
+    const safe = isNaN(m) ? 0 : m;
+    if (safe === current) return;
+    const saldada = safe >= monto;
+    const ok = await apiCall(`/api/debts?id=${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pagado: m, saldada }),
+      body: { pagado: safe, saldada },
     });
-    onChange();
+    if (ok) onChange();
   }
 
   async function toggleSaldada(id: string, current: boolean, monto: number) {
-    await fetch(`/api/debts?id=${id}`, {
+    const ok = await apiCall(`/api/debts?id=${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ saldada: !current, ...((!current) ? { pagado: monto } : {}) }),
+      body: { saldada: !current, ...((!current) ? { pagado: monto } : {}) },
     });
-    onChange();
+    if (ok) onChange();
   }
 
   async function remove(id: string) {
-    await fetch(`/api/debts?id=${id}`, { method: "DELETE" });
-    onChange();
+    const ok = await apiCall(`/api/debts?id=${id}`, { method: "DELETE" });
+    if (ok) onChange();
   }
 
   return (
     <TableShell
       title="Deudas"
       total={formatCLP(totalPagado)}
-      headers=  {["✓", "Deuda", "Monto", "Pagado", "Pendiente", ""]}
+      headers={["✓", "Deuda", "Monto", "Pagado", "Pendiente", ""]}
       rowCount={items.length}
       addRow={
         <div className="flex gap-2">
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Auto"
             className="flex-1 h-8 rounded border bg-background px-2 text-sm"
           />
           <input
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
             className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"
@@ -101,10 +108,9 @@ export function DebtsTable({
             <td className={"px-3 py-2 text-right " + cls}>{formatCLP(i.monto)}</td>
             <td className="px-3 py-2 text-right">
               <input
+                key={i.pagado}
                 defaultValue={i.pagado}
-                onBlur={(e) => {
-                  if (Number(e.target.value) !== i.pagado) updatePagado(i._id, e.target.value, i.monto);
-                }}
+                onBlur={(e) => updatePagado(i._id, e.target.value, i.monto, i.pagado)}
                 inputMode="numeric"
                 disabled={i.saldada}
                 className="w-24 h-7 rounded border bg-background px-2 text-sm text-right disabled:opacity-50"

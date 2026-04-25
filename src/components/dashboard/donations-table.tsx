@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn } from "./table-shell";
+import { apiCall, parseMonto } from "./api-call";
 import type { Donation } from "./types";
 
 export function DonationsTable({
@@ -15,22 +17,25 @@ export function DonationsTable({
   const total = items.reduce((s, i) => s + i.monto, 0);
 
   async function add() {
-    const m = parseInt(monto.replace(/\D/g, ""), 10);
-    if (!descripcion.trim() || !m || m <= 0) return;
+    const m = parseMonto(monto);
+    if (!descripcion.trim()) { toast.error("Falta la descripción"); return; }
+    if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
-    await fetch("/api/donations", {
+    const ok = await apiCall("/api/donations", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ descripcion: descripcion.trim(), monto: m, fecha, mes, anio }),
+      body: { descripcion: descripcion.trim(), monto: m, fecha, mes, anio },
     });
-    setDescripcion(""); setMonto("");
     setLoading(false);
-    onChange();
+    if (ok) {
+      setDescripcion(""); setMonto("");
+      toast.success("Donación agregada");
+      onChange();
+    }
   }
 
   async function remove(id: string) {
-    await fetch(`/api/donations?id=${id}`, { method: "DELETE" });
-    onChange();
+    const ok = await apiCall(`/api/donations?id=${id}`, { method: "DELETE" });
+    if (ok) onChange();
   }
 
   return (
@@ -44,12 +49,14 @@ export function DonationsTable({
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Incendios"
             className="flex-1 h-8 rounded border bg-background px-2 text-sm"
           />
           <input
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
             className="w-24 h-8 rounded border bg-background px-2 text-sm text-right"
