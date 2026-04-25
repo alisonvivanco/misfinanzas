@@ -38,3 +38,15 @@ export const MESES_ES_SHORT = [
 export function getMesNombre(mes: number): string {
   return MESES_ES[mes - 1] || "";
 }
+
+export function formatCLP(amount: number): string {
+  return new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function formatNumber(amount: number): string {
+  return new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(amount);
+}

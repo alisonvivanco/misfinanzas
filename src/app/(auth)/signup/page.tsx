@@ -25,7 +25,6 @@ const schema = z.object({
     .min(8, "Mínimo 8 caracteres")
     .regex(/[A-Z]/, "Al menos 1 mayúscula")
     .regex(/[0-9]/, "Al menos 1 número"),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]),
   acepta: z.literal(true, { errorMap: () => ({ message: "Debes aceptar los términos" }) }),
 });
 
@@ -46,7 +45,6 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { tipoIngreso: "honorarios" },
   });
 
   const rut = watch("rut");
@@ -136,7 +134,7 @@ export default function SignupPage() {
         />
         {errors.rut && <p className="text-xs text-destructive">{errors.rut.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Usamos tu RUT para identificarte y calcular correctamente tus impuestos.
+          Solo lo usamos para identificarte. No lo compartimos con nadie.
         </p>
       </div>
 
@@ -175,21 +173,6 @@ export default function SignupPage() {
           </button>
         </div>
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="tipoIngreso">Tipo de ingreso principal</Label>
-        <select
-          id="tipoIngreso"
-          {...register("tipoIngreso")}
-          className="flex h-11 w-full rounded-lg border border-input bg-background px-3.5 text-sm shadow-sm"
-        >
-          <option value="honorarios">Honorarios (independiente)</option>
-          <option value="dependiente">Sueldo (dependiente)</option>
-          <option value="mixto">Mixto</option>
-          <option value="negocio">Negocio / emprendimiento</option>
-          <option value="informal">Informal (sin boletas/facturas)</option>
-        </select>
       </div>
 
       <label className="flex items-start gap-2 text-xs text-muted-foreground">

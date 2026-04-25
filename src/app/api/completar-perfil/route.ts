@@ -8,7 +8,6 @@ import { validarRut, normalizarRut } from "@/lib/rut";
 const schema = z.object({
   rut: z.string().refine(validarRut, { message: "RUT inválido" }),
   telefono: z.string().min(8).max(20),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]),
 });
 
 export async function POST(req: NextRequest) {
@@ -54,7 +53,6 @@ export async function POST(req: NextRequest) {
         $set: {
           rut: rutNormalizado,
           telefono: parsed.data.telefono,
-          tipoIngreso: parsed.data.tipoIngreso,
           profileComplete: true,
         },
       },

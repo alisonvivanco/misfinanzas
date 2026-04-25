@@ -16,7 +16,6 @@ const schema = z.object({
   telefono: z
     .string()
     .regex(/^(\+?56)?\s?9?\s?\d{4}\s?\d{4}$/, "Formato: +56 9 1234 5678"),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -34,7 +33,6 @@ export default function CompletarPerfilPage() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { tipoIngreso: "honorarios" },
   });
 
   async function onSubmit(data: FormData) {
@@ -60,10 +58,10 @@ export default function CompletarPerfilPage() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-1.5">
-        <h1 className="text-2xl font-bold">Completa tu perfil</h1>
+        <h1 className="text-2xl font-bold">Casi listo</h1>
         <p className="text-sm text-muted-foreground">
           {session?.user?.name ? `Hola ${session.user.name.split(" ")[0]} — ` : ""}
-          necesitamos un par de datos más para calcular tus impuestos correctamente.
+          solo necesitamos dos cosas más para entrar.
         </p>
       </div>
 
@@ -81,7 +79,7 @@ export default function CompletarPerfilPage() {
         />
         {errors.rut && <p className="text-xs text-destructive">{errors.rut.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Usamos tu RUT para identificarte y calcular correctamente tus impuestos.
+          Solo lo usamos para identificarte. No lo compartimos con nadie.
         </p>
       </div>
 
@@ -94,21 +92,6 @@ export default function CompletarPerfilPage() {
           inputMode="tel"
         />
         {errors.telefono && <p className="text-xs text-destructive">{errors.telefono.message}</p>}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="tipoIngreso">Tipo de ingreso principal</Label>
-        <select
-          id="tipoIngreso"
-          {...register("tipoIngreso")}
-          className="flex h-11 w-full rounded-lg border border-input bg-background px-3.5 text-sm shadow-sm"
-        >
-          <option value="honorarios">Honorarios (independiente)</option>
-          <option value="dependiente">Sueldo (dependiente)</option>
-          <option value="mixto">Mixto</option>
-          <option value="negocio">Negocio / emprendimiento</option>
-          <option value="informal">Informal (sin boletas/facturas)</option>
-        </select>
       </div>
 
       {error && (
