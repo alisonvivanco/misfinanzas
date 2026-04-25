@@ -40,8 +40,15 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
   useEffect(() => {
     setLoading(true);
     fetch(`/api/annual?anio=${anio}`)
-      .then((r) => r.json())
-      .then(setData)
+      .then(async (r) => {
+        if (r.status === 402) {
+          if (typeof window !== "undefined") window.location.href = "/paywall";
+          return null;
+        }
+        if (!r.ok) return null;
+        return r.json();
+      })
+      .then((d) => d && setData(d))
       .finally(() => setLoading(false));
   }, [anio]);
 

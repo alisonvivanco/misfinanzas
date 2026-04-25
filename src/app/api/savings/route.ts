@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   const created = await Saving.create({
     ...parsed.data,
-    fechaMeta: parsed.data.fechaMeta ? new Date(parsed.data.fechaMeta) : undefined,
+    fechaMeta: parsed.data.fechaMeta ? new Date(parsed.data.fechaMeta + "T12:00:00Z") : undefined,
     userId: u.userId,
   });
   return NextResponse.json({ item: created }, { status: 201 });
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest) {
       $set: {
         ...parsed.data,
         ...(parsed.data.fechaMeta
-          ? { fechaMeta: new Date(parsed.data.fechaMeta) }
+          ? { fechaMeta: new Date(parsed.data.fechaMeta + "T12:00:00Z") }
           : {}),
       },
     },

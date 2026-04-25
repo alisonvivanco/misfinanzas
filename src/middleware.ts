@@ -14,7 +14,15 @@ import { GATE_COOKIE, isValidGateToken } from "@/lib/site-gate";
 
 const { auth } = NextAuth(authConfig);
 
-const GATE_BYPASS_PREFIXES = ["/acceso", "/api/acceso", "/api/health"];
+const GATE_BYPASS_PREFIXES = [
+  "/acceso",
+  "/api/acceso",
+  "/api/health",
+  // OAuth callbacks must reach NextAuth without redirecting through the gate.
+  // A new browser without the gate cookie hitting /api/auth/callback/google
+  // would otherwise lose the OAuth code/state.
+  "/api/auth",
+];
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
