@@ -53,6 +53,11 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
         fetch(`/api/donations?mes=${mes}&anio=${anio}`),
       ]);
       const responses = [incR, expR, recR, savR, debR, donR];
+      const expired = responses.find((r) => r.status === 402);
+      if (expired) {
+        window.location.href = "/paywall";
+        return;
+      }
       const failed = responses.find((r) => !r.ok);
       if (failed) {
         const body = await failed.json().catch(() => ({}));

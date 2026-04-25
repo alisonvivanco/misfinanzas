@@ -3,7 +3,7 @@ import { z } from "zod";
 import mongoose from "mongoose";
 import { dbConnect } from "@/lib/mongodb";
 import { Donation } from "@/models/Donation";
-import { requireUser, bad, badZod } from "@/lib/api-helpers";
+import { requireActiveUser, bad, badZod } from "@/lib/api-helpers";
 
 const createSchema = z.object({
   descripcion: z.string().min(1).max(120),
@@ -14,7 +14,7 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const u = await requireUser();
+  const u = await requireActiveUser();
   if ("error" in u) return u.error;
   const { searchParams } = new URL(req.url);
   const mes = Number(searchParams.get("mes"));
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const u = await requireUser();
+  const u = await requireActiveUser();
   if ("error" in u) return u.error;
   const body = await req.json().catch(() => null);
   const parsed = createSchema.safeParse(body);
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const u = await requireUser();
+  const u = await requireActiveUser();
   if ("error" in u) return u.error;
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");

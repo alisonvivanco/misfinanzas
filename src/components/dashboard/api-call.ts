@@ -20,6 +20,10 @@ export async function apiCall<T = unknown>(url: string, opts: ApiOptions = {}): 
     });
     let json: any = null;
     try { json = await res.json(); } catch { /* empty body */ }
+    if (res.status === 402 || json?.requiresSubscription) {
+      window.location.href = "/paywall";
+      return null;
+    }
     if (!res.ok) {
       const msg = json?.error || `Error ${res.status}`;
       toast.error(msg);
