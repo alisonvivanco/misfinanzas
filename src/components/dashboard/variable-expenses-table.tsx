@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCLP } from "@/lib/utils";
 import { CATEGORIAS_GASTO, CATEGORIA_TIPO_DEFAULT, TIPO_LABEL } from "@/lib/categorias";
 import { TableShell, DeleteBtn } from "./table-shell";
+import { apiCall, parseMonto } from "./api-call";
 import type { Bucket, Expense } from "./types";
 
 export function VariableExpensesTable({
@@ -24,22 +26,25 @@ export function VariableExpensesTable({
   }
 
   async function add() {
-    const m = parseInt(monto.replace(/\D/g, ""), 10);
-    if (!categoria.trim() || !m || m <= 0) return;
+    const m = parseMonto(monto);
+    if (!categoria.trim()) { toast.error("Falta la categoría"); return; }
+    if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
-    await fetch("/api/expenses", {
+    const ok = await apiCall("/api/expenses", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ categoria, monto: m, tipo, fecha, mes, anio }),
+      body: { categoria, monto: m, tipo, fecha, mes, anio },
     });
-    setMonto("");
     setLoading(false);
-    onChange();
+    if (ok) {
+      setMonto("");
+      toast.success("Gasto agregado");
+      onChange();
+    }
   }
 
   async function remove(id: string) {
-    await fetch(`/api/expenses?id=${id}`, { method: "DELETE" });
-    onChange();
+    const ok = await apiCall(`/api/expenses?id=${id}`, { method: "DELETE" });
+    if (ok) onChange();
   }
 
   return (
@@ -60,6 +65,7 @@ export function VariableExpensesTable({
           <input
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
             className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"

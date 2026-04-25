@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn } from "./table-shell";
+import { apiCall, parseMonto } from "./api-call";
 import type { Saving } from "./types";
 
 export function SavingsTable({
@@ -14,32 +16,36 @@ export function SavingsTable({
   const total = items.reduce((s, i) => s + i.montoAhorrado, 0);
 
   async function add() {
-    const m = parseInt(meta.replace(/\D/g, ""), 10);
-    if (!descripcion.trim() || !m || m <= 0) return;
+    const m = parseMonto(meta);
+    if (!descripcion.trim()) { toast.error("Falta la descripción"); return; }
+    if (!m || m <= 0) { toast.error("Meta inválida"); return; }
     setLoading(true);
-    await fetch("/api/savings", {
+    const ok = await apiCall("/api/savings", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ descripcion: descripcion.trim(), meta: m }),
+      body: { descripcion: descripcion.trim(), meta: m },
     });
-    setDescripcion(""); setMeta("");
     setLoading(false);
-    onChange();
+    if (ok) {
+      setDescripcion(""); setMeta("");
+      toast.success("Meta agregada");
+      onChange();
+    }
   }
 
-  async function updateAhorrado(id: string, v: string) {
-    const m = parseInt(v.replace(/\D/g, ""), 10) || 0;
-    await fetch(`/api/savings?id=${id}`, {
+  async function updateAhorrado(id: string, v: string, current: number) {
+    const m = parseMonto(v);
+    const safe = isNaN(m) ? 0 : m;
+    if (safe === current) return;
+    const ok = await apiCall(`/api/savings?id=${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ montoAhorrado: m }),
+      body: { montoAhorrado: safe },
     });
-    onChange();
+    if (ok) onChange();
   }
 
   async function remove(id: string) {
-    await fetch(`/api/savings?id=${id}`, { method: "DELETE" });
-    onChange();
+    const ok = await apiCall(`/api/savings?id=${id}`, { method: "DELETE" });
+    if (ok) onChange();
   }
 
   return (
@@ -53,12 +59,14 @@ export function SavingsTable({
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Vacaciones"
             className="flex-1 h-8 rounded border bg-background px-2 text-sm"
           />
           <input
             value={meta}
             onChange={(e) => setMeta(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Meta"
             inputMode="numeric"
             className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"
@@ -82,10 +90,9 @@ export function SavingsTable({
             <td className="px-3 py-2 text-right">{formatCLP(i.meta)}</td>
             <td className="px-3 py-2 text-right">
               <input
+                key={i.montoAhorrado}
                 defaultValue={i.montoAhorrado}
-                onBlur={(e) => {
-                  if (Number(e.target.value) !== i.montoAhorrado) updateAhorrado(i._id, e.target.value);
-                }}
+                onBlur={(e) => updateAhorrado(i._id, e.target.value, i.montoAhorrado)}
                 inputMode="numeric"
                 className="w-24 h-7 rounded border bg-background px-2 text-sm text-right"
               />

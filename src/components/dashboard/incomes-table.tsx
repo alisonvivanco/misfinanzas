@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn } from "./table-shell";
+import { apiCall, parseMonto } from "./api-call";
 import type { Income } from "./types";
 
 export function IncomesTable({
@@ -14,22 +16,25 @@ export function IncomesTable({
   const total = items.reduce((s, i) => s + i.monto, 0);
 
   async function add() {
-    const m = parseInt(monto.replace(/\D/g, ""), 10);
-    if (!fuente.trim() || !m || m <= 0) return;
+    const m = parseMonto(monto);
+    if (!fuente.trim()) { toast.error("Falta la fuente"); return; }
+    if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
-    await fetch("/api/income", {
+    const ok = await apiCall("/api/income", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fuente: fuente.trim(), monto: m, mes, anio }),
+      body: { fuente: fuente.trim(), monto: m, mes, anio },
     });
-    setFuente(""); setMonto("");
     setLoading(false);
-    onChange();
+    if (ok) {
+      setFuente(""); setMonto("");
+      toast.success("Ingreso agregado");
+      onChange();
+    }
   }
 
   async function remove(id: string) {
-    await fetch(`/api/income?id=${id}`, { method: "DELETE" });
-    onChange();
+    const ok = await apiCall(`/api/income?id=${id}`, { method: "DELETE" });
+    if (ok) onChange();
   }
 
   return (
@@ -43,12 +48,14 @@ export function IncomesTable({
           <input
             value={fuente}
             onChange={(e) => setFuente(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Fuente (ej: Trabajo)"
             className="flex-1 h-8 rounded border bg-background px-2 text-sm"
           />
           <input
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
             className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"

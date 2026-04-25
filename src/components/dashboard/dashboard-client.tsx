@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { MESES_ES, formatCLP } from "@/lib/utils";
 import { TIPO_PCT, TIPO_LABEL } from "@/lib/categorias";
 import type { Bucket, MonthData } from "./types";
@@ -43,14 +44,14 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
         fetch(`/api/debts`),
         fetch(`/api/donations?mes=${mes}&anio=${anio}`),
       ]);
-      const [inc, exp, rec, sav, deb, don] = await Promise.all([
-        incR.json(),
-        expR.json(),
-        recR.json(),
-        savR.json(),
-        debR.json(),
-        donR.json(),
-      ]);
+      const responses = [incR, expR, recR, savR, debR, donR];
+      const failed = responses.find((r) => !r.ok);
+      if (failed) {
+        const body = await failed.json().catch(() => ({}));
+        toast.error(body.error || `Error cargando datos (${failed.status})`);
+        return;
+      }
+      const [inc, exp, rec, sav, deb, don] = await Promise.all(responses.map((r) => r.json()));
       setData({
         incomes: inc.items || [],
         expenses: exp.items || [],
@@ -59,6 +60,9 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
         debts: deb.items || [],
         donations: don.items || [],
       });
+    } catch (e) {
+      console.error("[dashboard load]", e);
+      toast.error(e instanceof Error ? e.message : "Error cargando dashboard");
     } finally {
       setLoading(false);
     }
