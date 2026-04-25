@@ -51,37 +51,39 @@ export function DonationsTable({
       emptyMsg="Sin donaciones este mes"
       emptyHint="Causas que apoyaste"
       addRow={
-        <div className="flex flex-wrap gap-2">
+        <div className="space-y-2">
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Incendios"
-            className="flex-1 min-w-[120px] h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
+            className="w-full h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
-          <input
-            value={monto}
-            onChange={(e) => setMonto(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && add()}
-            placeholder="Monto"
-            inputMode="numeric"
-            className="w-24 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
-          />
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition"
-          />
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={add}
-            disabled={loading}
-            className="h-9 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-pink-600 text-white text-xs font-medium hover:shadow-md hover:shadow-pink-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
-          >
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-            Agregar
-          </motion.button>
+          <div className="flex gap-2">
+            <input
+              value={monto}
+              onChange={(e) => setMonto(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && add()}
+              placeholder="Monto"
+              inputMode="numeric"
+              className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
+            />
+            <input
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+              className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition shrink-0"
+            />
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={add}
+              disabled={loading}
+              className="h-9 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-pink-600 text-white text-xs font-medium hover:shadow-md hover:shadow-pink-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all shrink-0"
+            >
+              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+              Agregar
+            </motion.button>
+          </div>
         </div>
       }
     >

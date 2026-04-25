@@ -71,31 +71,33 @@ export function DebtsTable({
       emptyMsg="Sin deudas registradas"
       emptyHint="Crédito de auto, tarjeta, lo que sea…"
       addRow={
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Auto"
-            className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
+            className="w-full h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
-          <input
-            value={monto}
-            onChange={(e) => setMonto(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && add()}
-            placeholder="Monto"
-            inputMode="numeric"
-            className="w-28 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
-          />
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={add}
-            disabled={loading}
-            className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium hover:shadow-md hover:shadow-blue-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
-          >
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-            Agregar
-          </motion.button>
+          <div className="flex gap-2">
+            <input
+              value={monto}
+              onChange={(e) => setMonto(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && add()}
+              placeholder="Monto"
+              inputMode="numeric"
+              className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
+            />
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={add}
+              disabled={loading}
+              className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium hover:shadow-md hover:shadow-blue-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all shrink-0"
+            >
+              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+              Agregar
+            </motion.button>
+          </div>
         </div>
       }
     >
