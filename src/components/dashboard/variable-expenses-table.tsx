@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
-import { CATEGORIAS_GASTO, CATEGORIA_TIPO_DEFAULT, TIPO_LABEL } from "@/lib/categorias";
-import { TableShell, DeleteBtn } from "./table-shell";
+import { CATEGORIAS_GASTO, CATEGORIA_TIPO_DEFAULT } from "@/lib/categorias";
+import { TableShell, DeleteBtn, Row } from "./table-shell";
+import { BucketBadge } from "./bucket-badge";
 import { apiCall, parseMonto } from "./api-call";
 import type { Bucket, Expense } from "./types";
 
@@ -50,15 +52,20 @@ export function VariableExpensesTable({
   return (
     <TableShell
       title="Gastos variables"
+      Icon={ShoppingBag}
+      iconClass="bg-rose-500/10 text-rose-600 dark:text-rose-400"
       total={formatCLP(total)}
       headers={["Categoría", "Monto", "Tipo", "Fecha", ""]}
       rowCount={items.length}
+      emptyEmoji="🛒"
+      emptyMsg="Sin gastos variables este mes"
+      emptyHint="Mercado, transporte, salidas…"
       addRow={
         <div className="flex flex-wrap gap-2">
           <select
             value={categoria}
             onChange={(e) => onCategoriaChange(e.target.value)}
-            className="h-8 rounded border bg-background px-2 text-sm flex-1 min-w-[140px]"
+            className="h-9 rounded-lg border bg-background px-3 text-sm flex-1 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-ring transition"
           >
             {CATEGORIAS_GASTO.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -68,44 +75,47 @@ export function VariableExpensesTable({
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
-            className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"
+            className="w-28 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value as Bucket)}
-            className="h-8 rounded border bg-background px-2 text-xs"
+            className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition"
           >
-            <option value="necesidades">Necesidades</option>
-            <option value="deseos">Deseos</option>
-            <option value="ahorros">Ahorros</option>
+            <option value="necesidades">Necesidad</option>
+            <option value="deseos">Deseo</option>
+            <option value="ahorros">Ahorro</option>
           </select>
           <input
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
-            className="h-8 rounded border bg-background px-2 text-xs"
+            className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition"
           />
-          <button
+          <motion.button
+            whileTap={{ scale: 0.96 }}
             onClick={add}
             disabled={loading}
-            className="h-8 px-3 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-medium hover:shadow-md hover:shadow-rose-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
           >
-            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Agregar
-          </button>
+          </motion.button>
         </div>
       }
     >
       {items.map((i) => (
-        <tr key={i._id} className="border-t">
-          <td className="px-3 py-2">{i.categoria}</td>
-          <td className="px-3 py-2 text-right">{formatCLP(i.monto)}</td>
-          <td className="px-3 py-2 text-right text-xs text-muted-foreground">{TIPO_LABEL[i.tipo]}</td>
-          <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-            {i.fecha ? new Date(i.fecha).toLocaleDateString("es-CL", { day: "2-digit", month: "short" }) : "—"}
+        <Row key={i._id}>
+          <td className="px-4 py-2.5 font-medium">{i.categoria}</td>
+          <td className="px-4 py-2.5 text-right tabular-nums">{formatCLP(i.monto)}</td>
+          <td className="px-4 py-2.5 text-right"><BucketBadge tipo={i.tipo} /></td>
+          <td className="px-4 py-2.5 text-right text-xs text-muted-foreground tabular-nums">
+            {i.fecha
+              ? new Date(i.fecha).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })
+              : "—"}
           </td>
-          <td className="px-3 py-2 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
-        </tr>
+          <td className="px-4 py-2.5 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
+        </Row>
       ))}
     </TableShell>
   );

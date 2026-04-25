@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { MESES_ES, formatCLP } from "@/lib/utils";
-import { TIPO_PCT, TIPO_LABEL } from "@/lib/categorias";
+import { TIPO_PCT } from "@/lib/categorias";
+import { bucketColor } from "./bucket-badge";
 import type { Bucket, MonthData } from "./types";
 import { DashboardCharts } from "./dashboard-charts";
 import { IncomesTable } from "./incomes-table";
@@ -25,6 +27,12 @@ const EMPTY: MonthData = {
   savings: [],
   debts: [],
   donations: [],
+};
+
+const BUCKET_LABEL: Record<Bucket, string> = {
+  necesidades: "Necesidades",
+  deseos: "Deseos",
+  ahorros: "Ahorros",
 };
 
 export function DashboardClient({ initialMes, initialAnio }: Props) {
@@ -106,35 +114,66 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
     setMes(m); setAnio(a);
   }
 
+  const isCurrentMonth = mes === new Date().getMonth() + 1 && anio === new Date().getFullYear();
+
   return (
     <div className="space-y-6">
-      {/* Header con selector de mes */}
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => shiftMonth(-1)}
-            className="rounded-lg border bg-card p-2 hover:bg-accent transition"
-            aria-label="Mes anterior"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <h1 className="text-3xl font-bold tracking-tight min-w-[200px] text-center">
-            {MESES_ES[mes - 1]} {anio}
-          </h1>
-          <button
-            onClick={() => shiftMonth(1)}
-            className="rounded-lg border bg-card p-2 hover:bg-accent transition"
-            aria-label="Mes siguiente"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex flex-wrap items-center justify-between gap-3"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-2xl border bg-card shadow-sm p-1">
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={() => shiftMonth(-1)}
+              className="rounded-xl p-2 hover:bg-muted transition"
+              aria-label="Mes anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </motion.button>
+            <div className="px-3 py-1 min-w-[180px] text-center">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                {isCurrentMonth ? "Mes actual" : "Viendo"}
+              </div>
+              <div className="text-base font-bold tracking-tight">
+                {MESES_ES[mes - 1]} {anio}
+              </div>
+            </div>
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={() => shiftMonth(1)}
+              className="rounded-xl p-2 hover:bg-muted transition"
+              aria-label="Mes siguiente"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </motion.button>
+          </div>
+          {!isCurrentMonth && (
+            <motion.button
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => {
+                const now = new Date();
+                setMes(now.getMonth() + 1);
+                setAnio(now.getFullYear());
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground transition flex items-center gap-1"
+            >
+              <Sparkles className="h-3 w-3" />
+              Volver al mes actual
+            </motion.button>
+          )}
         </div>
-      </header>
+      </motion.header>
 
       {/* KPIs + Charts */}
       <DashboardCharts totales={totales} loading={loading} />
 
-      {/* Ingresos + Gastos Fijos en 2 col */}
+      {/* Ingresos + Gastos Fijos */}
       <div className="grid lg:grid-cols-2 gap-4">
         <IncomesTable items={data.incomes} mes={mes} anio={anio} onChange={load} />
         <FixedExpensesTable items={data.recurring} onChange={load} />
@@ -152,57 +191,135 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
 
       {/* Presupuesto 50/30/20 + Presupuesto vs Actual */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <div className="rounded-2xl border bg-card p-5">
-          <h3 className="font-semibold mb-4">Presupuesto 50/30/20</h3>
-          <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground">
-              <tr><th className="text-left pb-2">Categoría</th><th className="text-right pb-2">%</th><th className="text-right pb-2">Presupuesto</th><th className="text-right pb-2">Gastado</th></tr>
-            </thead>
-            <tbody>
-              {(["necesidades", "deseos", "ahorros"] as Bucket[]).map((b) => (
-                <tr key={b} className="border-t">
-                  <td className="py-2">{TIPO_LABEL[b]}</td>
-                  <td className="text-right">{(TIPO_PCT[b] * 100).toFixed(0)}%</td>
-                  <td className="text-right font-medium">{formatCLP(presupuesto[b])}</td>
-                  <td className="text-right">
-                    <span className={totales.buckets[b] > presupuesto[b] ? "text-destructive font-medium" : ""}>
-                      {formatCLP(totales.buckets[b])}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              <tr className="border-t font-semibold bg-muted/30">
-                <td className="py-2">Total</td>
-                <td className="text-right">100%</td>
-                <td className="text-right">{formatCLP(totales.ingreso)}</td>
-                <td className="text-right">{formatCLP(totales.buckets.necesidades + totales.buckets.deseos + totales.buckets.ahorros)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <BudgetBlock totales={totales} presupuesto={presupuesto} />
+        <SummaryBlock totales={totales} />
+      </div>
+    </div>
+  );
+}
 
-        <div className="rounded-2xl border bg-card p-5">
-          <h3 className="font-semibold mb-4">Presupuesto vs Actual</h3>
-          <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground">
-              <tr><th className="text-left pb-2">Concepto</th><th className="text-right pb-2">Monto</th></tr>
-            </thead>
-            <tbody>
-              <tr className="border-t"><td className="py-2">Ingresos</td><td className="text-right text-income font-medium">{formatCLP(totales.ingreso)}</td></tr>
-              <tr className="border-t"><td className="py-2">Gastos fijos</td><td className="text-right">{formatCLP(totales.gastoFijo)}</td></tr>
-              <tr className="border-t"><td className="py-2">Gastos variables</td><td className="text-right">{formatCLP(totales.gastoVariable)}</td></tr>
-              <tr className="border-t"><td className="py-2">Donaciones</td><td className="text-right">{formatCLP(totales.donaciones)}</td></tr>
-              <tr className="border-t font-semibold bg-muted/30">
-                <td className="py-2">Restante</td>
-                <td className={"text-right " + (totales.restante < 0 ? "text-destructive" : "text-income")}>
-                  {formatCLP(totales.restante)}
-                  {totales.restante < 0 && <span className="ml-2 text-xs">Saldo en contra</span>}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+function BudgetBlock({
+  totales, presupuesto,
+}: {
+  totales: { ingreso: number; buckets: Record<Bucket, number> };
+  presupuesto: Record<Bucket, number>;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
+      className="rounded-2xl border bg-card shadow-sm hover:shadow-md transition-shadow p-5"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-sm">Regla 50/30/20</h3>
+        <span className="text-xs text-muted-foreground">Sobre tu ingreso</span>
+      </div>
+      <div className="space-y-4">
+        {(["necesidades", "deseos", "ahorros"] as Bucket[]).map((b) => {
+          const target = presupuesto[b];
+          const actual = totales.buckets[b];
+          const pct = target > 0 ? Math.min(100, (actual / target) * 100) : 0;
+          const over = actual > target && target > 0;
+          return (
+            <div key={b}>
+              <div className="flex items-center justify-between mb-1.5 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full" style={{ background: bucketColor(b) }} />
+                  <span className="font-medium">{BUCKET_LABEL[b]}</span>
+                  <span className="text-xs text-muted-foreground">{(TIPO_PCT[b] * 100).toFixed(0)}%</span>
+                </div>
+                <div className="text-right">
+                  <span className={"font-semibold tabular-nums " + (over ? "text-rose-600 dark:text-rose-400" : "")}>
+                    {formatCLP(actual)}
+                  </span>
+                  <span className="text-xs text-muted-foreground tabular-nums"> / {formatCLP(target)}</span>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full rounded-full"
+                  style={{
+                    background: over
+                      ? "linear-gradient(90deg, #f43f5e, #be123c)"
+                      : `linear-gradient(90deg, ${bucketColor(b)}, ${bucketColor(b)}cc)`,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function SummaryBlock({
+  totales,
+}: {
+  totales: {
+    ingreso: number;
+    gastoFijo: number;
+    gastoVariable: number;
+    donaciones: number;
+    restante: number;
+  };
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.15 }}
+      className="rounded-2xl border bg-card shadow-sm hover:shadow-md transition-shadow p-5"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-sm">Resumen del mes</h3>
+      </div>
+      <div className="space-y-2.5">
+        <Row label="Ingresos" value={totales.ingreso} positive />
+        <Row label="Gastos fijos" value={-totales.gastoFijo} />
+        <Row label="Gastos variables" value={-totales.gastoVariable} />
+        <Row label="Donaciones" value={-totales.donaciones} />
+        <div className="border-t pt-3 mt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold">Te queda</span>
+            <span
+              className={
+                "text-2xl font-bold tabular-nums " +
+                (totales.restante < 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400")
+              }
+            >
+              {formatCLP(totales.restante)}
+            </span>
+          </div>
+          {totales.restante < 0 && (
+            <div className="text-xs text-rose-600 dark:text-rose-400 text-right mt-0.5">
+              Saldo en contra
+            </div>
+          )}
         </div>
       </div>
+    </motion.div>
+  );
+}
+
+function Row({ label, value, positive }: { label: string; value: number; positive?: boolean }) {
+  const cls = value === 0
+    ? "text-muted-foreground"
+    : positive
+    ? "text-emerald-600 dark:text-emerald-400"
+    : value < 0
+    ? "text-foreground"
+    : "";
+  return (
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={"font-medium tabular-nums " + cls}>
+        {value < 0 ? "− " : ""}{formatCLP(Math.abs(value))}
+      </span>
     </div>
   );
 }

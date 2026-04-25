@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Receipt } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
-import { TIPO_LABEL } from "@/lib/categorias";
-import { TableShell, DeleteBtn } from "./table-shell";
+import { TableShell, DeleteBtn, Row } from "./table-shell";
+import { BucketBadge } from "./bucket-badge";
 import { apiCall, parseMonto } from "./api-call";
 import type { Bucket, Recurring } from "./types";
 
@@ -42,17 +43,22 @@ export function FixedExpensesTable({
   return (
     <TableShell
       title="Gastos fijos"
+      Icon={Receipt}
+      iconClass="bg-orange-500/10 text-orange-600 dark:text-orange-400"
       total={formatCLP(total)}
       headers={["Descripción", "Monto", "Tipo", ""]}
       rowCount={items.length}
+      emptyEmoji="🏠"
+      emptyMsg="No hay gastos fijos"
+      emptyHint="Arriendo, Internet, Netflix, plan móvil…"
       addRow={
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Arriendo"
-            className="flex-1 h-8 rounded border bg-background px-2 text-sm"
+            className="flex-1 min-w-[120px] h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <input
             value={monto}
@@ -60,35 +66,36 @@ export function FixedExpensesTable({
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
-            className="w-24 h-8 rounded border bg-background px-2 text-sm text-right"
+            className="w-24 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value as Bucket)}
-            className="h-8 rounded border bg-background px-2 text-xs"
+            className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition"
           >
-            <option value="necesidades">Necesidades</option>
-            <option value="deseos">Deseos</option>
-            <option value="ahorros">Ahorros</option>
+            <option value="necesidades">Necesidad</option>
+            <option value="deseos">Deseo</option>
+            <option value="ahorros">Ahorro</option>
           </select>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.96 }}
             onClick={add}
             disabled={loading}
-            className="h-8 px-3 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-medium hover:shadow-md hover:shadow-orange-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
           >
-            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Agregar
-          </button>
+          </motion.button>
         </div>
       }
     >
       {items.map((i) => (
-        <tr key={i._id} className="border-t">
-          <td className="px-3 py-2">{i.descripcion}</td>
-          <td className="px-3 py-2 text-right">{formatCLP(i.monto)}</td>
-          <td className="px-3 py-2 text-right text-xs text-muted-foreground">{TIPO_LABEL[i.tipo]}</td>
-          <td className="px-3 py-2 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
-        </tr>
+        <Row key={i._id}>
+          <td className="px-4 py-2.5 font-medium">{i.descripcion}</td>
+          <td className="px-4 py-2.5 text-right tabular-nums">{formatCLP(i.monto)}</td>
+          <td className="px-4 py-2.5 text-right"><BucketBadge tipo={i.tipo} /></td>
+          <td className="px-4 py-2.5 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
+        </Row>
       ))}
     </TableShell>
   );

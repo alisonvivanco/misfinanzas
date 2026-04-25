@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
-import { TableShell, DeleteBtn } from "./table-shell";
+import { TableShell, DeleteBtn, Row } from "./table-shell";
 import { apiCall, parseMonto } from "./api-call";
 import type { Donation } from "./types";
 
@@ -41,17 +42,22 @@ export function DonationsTable({
   return (
     <TableShell
       title="Donaciones"
+      Icon={Heart}
+      iconClass="bg-pink-500/10 text-pink-600 dark:text-pink-400"
       total={formatCLP(total)}
       headers={["Descripción", "Monto", "Fecha", ""]}
       rowCount={items.length}
+      emptyEmoji="❤️"
+      emptyMsg="Sin donaciones este mes"
+      emptyHint="Causas que apoyaste"
       addRow={
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Incendios"
-            className="flex-1 h-8 rounded border bg-background px-2 text-sm"
+            className="flex-1 min-w-[120px] h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <input
             value={monto}
@@ -59,34 +65,37 @@ export function DonationsTable({
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
             inputMode="numeric"
-            className="w-24 h-8 rounded border bg-background px-2 text-sm text-right"
+            className="w-24 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <input
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
-            className="h-8 rounded border bg-background px-2 text-xs"
+            className="h-9 rounded-lg border bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring transition"
           />
-          <button
+          <motion.button
+            whileTap={{ scale: 0.96 }}
             onClick={add}
             disabled={loading}
-            className="h-8 px-3 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-pink-600 text-white text-xs font-medium hover:shadow-md hover:shadow-pink-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
           >
-            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Agregar
-          </button>
+          </motion.button>
         </div>
       }
     >
       {items.map((i) => (
-        <tr key={i._id} className="border-t">
-          <td className="px-3 py-2">{i.descripcion}</td>
-          <td className="px-3 py-2 text-right">{formatCLP(i.monto)}</td>
-          <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-            {i.fecha ? new Date(i.fecha).toLocaleDateString("es-CL", { day: "2-digit", month: "short" }) : "—"}
+        <Row key={i._id}>
+          <td className="px-4 py-2.5 font-medium">{i.descripcion}</td>
+          <td className="px-4 py-2.5 text-right tabular-nums">{formatCLP(i.monto)}</td>
+          <td className="px-4 py-2.5 text-right text-xs text-muted-foreground tabular-nums">
+            {i.fecha
+              ? new Date(i.fecha).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })
+              : "—"}
           </td>
-          <td className="px-3 py-2 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
-        </tr>
+          <td className="px-4 py-2.5 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
+        </Row>
       ))}
     </TableShell>
   );

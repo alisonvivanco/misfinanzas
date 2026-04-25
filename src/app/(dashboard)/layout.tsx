@@ -15,13 +15,13 @@ export default async function DashboardLayout({
 
   return (
     <SessionProvider session={session}>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background gradient-mesh-soft">
         <Sidebar user={{ name: session.user.name, email: session.user.email }} />
         <main className="flex-1 overflow-y-auto">
           <div className="container py-8 max-w-7xl">{children}</div>
         </main>
       </div>
-      <Toaster richColors closeButton position="top-right" />
+      <Toaster richColors closeButton position="top-right" theme="system" />
     </SessionProvider>
   );
 }
