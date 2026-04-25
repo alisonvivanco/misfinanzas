@@ -2,10 +2,10 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
-  sm: { box: 28, text: "text-base" },
-  md: { box: 36, text: "text-lg" },
-  lg: { box: 44, text: "text-xl" },
-  xl: { box: 56, text: "text-2xl" },
+  sm: 28,
+  md: 36,
+  lg: 44,
+  xl: 56,
 } as const;
 
 export function LogoMark({
@@ -15,11 +15,11 @@ export function LogoMark({
   size?: keyof typeof SIZES;
   className?: string;
 }) {
-  const px = SIZES[size].box;
+  const px = SIZES[size];
   return (
     <Image
       src="/logo.png"
-      alt="AlisonVivanco.cl"
+      alt="MisFinanzas"
       width={px}
       height={px}
       priority
@@ -28,24 +28,15 @@ export function LogoMark({
   );
 }
 
+/** Backwards-compatible alias — only renders the mark, no wordmark text. */
 export function Logo({
   size = "md",
-  showWordmark = true,
   className,
 }: {
   size?: keyof typeof SIZES;
+  /** Kept for backwards compat but ignored — wordmark removed. */
   showWordmark?: boolean;
   className?: string;
 }) {
-  const text = SIZES[size].text;
-  return (
-    <div className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark size={size} />
-      {showWordmark && (
-        <span className={cn("font-bold tracking-tight", text)}>
-          AlisonVivanco<span className="gradient-text">.cl</span>
-        </span>
-      )}
-    </div>
-  );
+  return <LogoMark size={size} className={className} />;
 }
