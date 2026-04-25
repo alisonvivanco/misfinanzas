@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { isAdminEmail } from "@/lib/subscription";
+import { isAdminEmail } from "@/lib/subscription-server";
 
 const schema = z.object({
   userId: z.string().refine(mongoose.isValidObjectId, "id inválido"),
@@ -12,6 +12,21 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Origin check — reject cross-site POSTs (defense-in-depth, since SameSite=Lax
+  // on the session cookie already blocks most scenarios).
+  const origin = req.headers.get("origin");
+  const host = req.headers.get("host");
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost !== host) {
+        return NextResponse.json({ error: "Origen no permitido" }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ error: "Origen inválido" }, { status: 403 });
+    }
+  }
+
   const session = await auth();
   if (!session?.user?.email || !isAdminEmail(session.user.email)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });

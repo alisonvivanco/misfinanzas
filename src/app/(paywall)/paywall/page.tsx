@@ -4,6 +4,7 @@ import { auth, signOut } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { getSubscriptionStatus, SUBSCRIBE_URL } from "@/lib/subscription";
+import { isAdminEmail } from "@/lib/subscription-server";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Check, ArrowRight, Heart } from "lucide-react";
 
@@ -16,10 +17,10 @@ export default async function PaywallPage() {
     .select("email nombre plan trialEndsAt subscribedUntil")
     .lean();
   const status = getSubscriptionStatus({
-    email: dbUser?.email ?? session.user.email,
     plan: dbUser?.plan,
     trialEndsAt: dbUser?.trialEndsAt,
     subscribedUntil: dbUser?.subscribedUntil,
+    isAdmin: isAdminEmail(dbUser?.email ?? session.user.email),
   });
 
   // If somehow active, send them back to the app.

@@ -15,7 +15,7 @@ interface UserRow {
   active: boolean;
   daysLeft: number | null;
   expiresAt: string | null;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 const STATUS_BADGE: Record<UserRow["status"], { Icon: typeof CheckCircle2; cls: string; label: string }> = {

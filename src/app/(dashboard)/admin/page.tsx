@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { isAdminEmail, getSubscriptionStatus } from "@/lib/subscription";
+import { getSubscriptionStatus } from "@/lib/subscription";
+import { isAdminEmail } from "@/lib/subscription-server";
 import { AdminClient } from "@/components/admin/admin-client";
 
 export default async function AdminPage() {
@@ -19,10 +20,10 @@ export default async function AdminPage() {
 
   const users = usersRaw.map((u) => {
     const status = getSubscriptionStatus({
-      email: u.email,
       plan: u.plan,
       trialEndsAt: u.trialEndsAt,
       subscribedUntil: u.subscribedUntil,
+      isAdmin: isAdminEmail(u.email),
     });
     return {
       _id: String(u._id),
@@ -34,7 +35,7 @@ export default async function AdminPage() {
       active: status.active,
       daysLeft: status.daysLeft,
       expiresAt: status.expiresAt ? status.expiresAt.toISOString() : null,
-      createdAt: u.createdAt.toISOString(),
+      createdAt: u.createdAt ? u.createdAt.toISOString() : null,
     };
   });
 

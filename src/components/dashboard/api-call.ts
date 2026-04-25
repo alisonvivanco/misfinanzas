@@ -21,7 +21,7 @@ export async function apiCall<T = unknown>(url: string, opts: ApiOptions = {}): 
     let json: any = null;
     try { json = await res.json(); } catch { /* empty body */ }
     if (res.status === 402 || json?.requiresSubscription) {
-      window.location.href = "/paywall";
+      if (typeof window !== "undefined") window.location.href = "/paywall";
       return null;
     }
     if (!res.ok) {

@@ -1,17 +1,36 @@
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { SUBSCRIBE_URL } from "@/lib/subscription";
+import { SUBSCRIBE_URL, MANAGE_SUBSCRIPTION_URL } from "@/lib/subscription";
 
-export function TrialBanner({ daysLeft, expiresAt }: { daysLeft: number; expiresAt: Date | null }) {
+export function TrialBanner({
+  kind = "trial",
+  daysLeft,
+  expiresAt,
+}: {
+  kind?: "trial" | "paid";
+  daysLeft: number;
+  expiresAt: Date | null;
+}) {
   const expira = expiresAt
     ? new Intl.DateTimeFormat("es-CL", { day: "2-digit", month: "long" }).format(new Date(expiresAt))
     : null;
-  const msg =
-    daysLeft <= 0
-      ? "Tu prueba expira hoy"
+
+  const isPaid = kind === "paid";
+  const msg = isPaid
+    ? daysLeft <= 0
+      ? "Tu suscripción se renueva hoy"
       : daysLeft === 1
-      ? "Tu prueba expira mañana"
-      : `Tu prueba expira en ${daysLeft} días`;
+      ? "Tu suscripción se renueva mañana"
+      : `Tu suscripción se renueva en ${daysLeft} días`
+    : daysLeft <= 0
+    ? "Tu prueba expira hoy"
+    : daysLeft === 1
+    ? "Tu prueba expira mañana"
+    : `Tu prueba expira en ${daysLeft} días`;
+
+  const href = isPaid ? MANAGE_SUBSCRIPTION_URL : SUBSCRIBE_URL;
+  const cta = isPaid ? "Gestionar" : "Suscribirme";
+
   return (
     <div className="rounded-2xl border bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent p-4 flex items-center justify-between gap-3">
       <div className="flex items-center gap-3">
@@ -20,18 +39,16 @@ export function TrialBanner({ daysLeft, expiresAt }: { daysLeft: number; expires
         </div>
         <div>
           <div className="text-sm font-semibold">{msg}</div>
-          {expira && (
-            <div className="text-xs text-muted-foreground">Termina el {expira}</div>
-          )}
+          {expira && <div className="text-xs text-muted-foreground">{isPaid ? `Próximo cargo el ${expira}` : `Termina el ${expira}`}</div>}
         </div>
       </div>
       <Link
-        href={SUBSCRIBE_URL}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-medium hover:shadow-md transition shrink-0"
       >
-        Suscribirme
+        {cta}
         <ArrowRight className="h-3.5 w-3.5" />
       </Link>
     </div>
