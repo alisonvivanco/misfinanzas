@@ -22,6 +22,8 @@ const GATE_BYPASS_PREFIXES = [
   // A new browser without the gate cookie hitting /api/auth/callback/google
   // would otherwise lose the OAuth code/state.
   "/api/auth",
+  // Server-to-server webhooks (MercadoPago, etc.) — never go through the gate.
+  "/api/webhooks",
 ];
 
 export default auth(async (req) => {
