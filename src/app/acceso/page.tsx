@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff, Lock } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 export default function AccesoPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background gradient-mesh p-6">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="inline-flex items-baseline gap-1.5 mb-8">
-            <span className="font-bold text-2xl tracking-tight">AlisonVivanco</span>
-            <span className="font-bold text-2xl tracking-tight text-primary">.cl</span>
+          <div className="inline-block mb-8">
+            <Logo size="lg" />
           </div>
         </div>
         <div className="rounded-3xl border bg-card p-8 shadow-xl">

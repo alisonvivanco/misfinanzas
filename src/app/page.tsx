@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, BarChart3, Calendar, PieChart, Target, Wallet, Heart } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 export default function LandingPage() {
   return (
@@ -8,9 +9,8 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-baseline gap-1">
-            <span className="font-bold text-lg tracking-tight">AlisonVivanco</span>
-            <span className="font-bold text-lg tracking-tight text-primary">.cl</span>
+          <Link href="/">
+            <Logo size="md" />
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition">Características</Link>
