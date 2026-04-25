@@ -74,6 +74,24 @@
     font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "ss01" 1;
   }
   .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* Native <select> chevron: default browser arrow se pega al borde derecho.
+     Reemplazo con un chevron SVG inline posicionado a 12px del borde, dejando
+     padding visual entre el ícono y el borde + entre el ícono y el texto. */
+  select:not([multiple]):not([size]) {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><polyline points='5 7.5 10 12.5 15 7.5'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding-right: 36px !important;
+  }
+  /* Dark mode: chevron color más claro para mejor contraste. */
+  .dark select:not([multiple]):not([size]) {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><polyline points='5 7.5 10 12.5 15 7.5'/></svg>");
+  }
 }
 
 @layer components {

@@ -9,6 +9,7 @@ const tipoEnum = z.enum(["necesidades", "deseos", "ahorros"]);
 
 const createSchema = z.object({
   categoria: z.string().min(1).max(80),
+  descripcion: z.string().max(200).optional(),
   monto: z.number().nonnegative(),
   tipo: tipoEnum,
   fecha: z.string().optional(),

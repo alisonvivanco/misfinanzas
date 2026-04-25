@@ -11,6 +11,7 @@ export interface Income {
 export interface Expense {
   _id: string;
   categoria: string;
+  descripcion?: string;
   monto: number;
   tipo: Bucket;
   fecha?: string;
