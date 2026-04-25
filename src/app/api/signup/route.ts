@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const verificationToken = generateToken(48);
     const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const trialEnds = new Date(
-      Date.now() + Number(process.env.FREE_TRIAL_DAYS || 14) * 24 * 60 * 60 * 1000
+      Date.now() + Number(process.env.FREE_TRIAL_DAYS || 1) * 24 * 60 * 60 * 1000
     );
 
     const user = await User.create({
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       tipoIngreso: data.tipoIngreso || "honorarios",
     });
 
-    await sendVerificationEmail(user.email, user.nombre, verificationToken);
+    await sendVerificationEmail(user.email, user.nombre || "", verificationToken);
 
     return NextResponse.json(
       {

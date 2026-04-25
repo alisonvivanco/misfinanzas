@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { validarRut, formatearRut } from "@/lib/rut";
 import { Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
+import { GoogleButton } from "@/components/auth/google-button";
 
 const schema = z.object({
   nombre: z.string().min(2, "Muy corto"),
@@ -93,8 +94,19 @@ export default function SignupPage() {
       <div className="space-y-1.5">
         <h1 className="text-2xl font-bold">Crear cuenta</h1>
         <p className="text-sm text-muted-foreground">
-          14 días de prueba gratis. Sin tarjeta.
+          1 día de prueba gratis. Cancela cuando quieras.
         </p>
+      </div>
+
+      <GoogleButton label="Registrarse con Google" />
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">o con email</span>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -124,7 +136,7 @@ export default function SignupPage() {
         />
         {errors.rut && <p className="text-xs text-destructive">{errors.rut.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Usamos tu RUT para integrarnos con el SII vía Clave Única (próximamente).
+          Usamos tu RUT para identificarte y calcular correctamente tus impuestos.
         </p>
       </div>
 
