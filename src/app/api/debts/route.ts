@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const created = await Debt.create({
     ...parsed.data,
     fechaVencimiento: parsed.data.fechaVencimiento
-      ? new Date(parsed.data.fechaVencimiento)
+      ? new Date(parsed.data.fechaVencimiento + "T12:00:00Z")
       : undefined,
     userId: u.userId,
   });
@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest) {
       $set: {
         ...parsed.data,
         ...(parsed.data.fechaVencimiento
-          ? { fechaVencimiento: new Date(parsed.data.fechaVencimiento) }
+          ? { fechaVencimiento: new Date(parsed.data.fechaVencimiento + "T12:00:00Z") }
           : {}),
       },
     },

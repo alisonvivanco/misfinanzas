@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   const created = await Donation.create({
     ...parsed.data,
-    fecha: parsed.data.fecha ? new Date(parsed.data.fecha) : undefined,
+    fecha: parsed.data.fecha ? new Date(parsed.data.fecha + "T12:00:00Z") : undefined,
     userId: u.userId,
   });
   return NextResponse.json({ item: created }, { status: 201 });

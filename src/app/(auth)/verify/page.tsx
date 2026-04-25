@@ -51,10 +51,7 @@ function VerifyContent() {
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
-          ¿No llegó? Revisa spam o{" "}
-          <Link href="/forgot" className="text-primary hover:underline">
-            solicita uno nuevo
-          </Link>
+          ¿No llegó? Revisá spam o registrate de nuevo.
         </p>
       </div>
     );
@@ -91,8 +88,8 @@ function VerifyContent() {
             <h1 className="text-2xl font-bold">No se pudo verificar</h1>
             <p className="text-muted-foreground">{message}</p>
           </div>
-          <Link href="/forgot">
-            <Button variant="outline" className="w-full">Solicitar nuevo enlace</Button>
+          <Link href="/signup">
+            <Button variant="outline" className="w-full">Volver a registrarse</Button>
           </Link>
         </>
       )}

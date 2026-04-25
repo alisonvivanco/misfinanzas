@@ -2,8 +2,12 @@
  * Full auth config — usa MongoDB adapter y bcryptjs.
  * IMPORTANTE: solo se importa en contextos Node.js runtime (nunca en middleware).
  */
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+
+class EmailNotVerifiedError extends CredentialsSignin {
+  code = "EMAIL_NOT_VERIFIED";
+}
 import Google from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { ObjectId } from "mongodb";
@@ -40,7 +44,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(parsed.data.password, user.password);
         if (!ok) return null;
         if (!user.emailVerified) {
-          throw new Error("EMAIL_NOT_VERIFIED");
+          // Auth.js v5 surfaces this code via signIn()'s response code field.
+          throw new EmailNotVerifiedError();
         }
         await User.updateOne({ _id: user._id }, { lastLoginAt: new Date() });
         return {

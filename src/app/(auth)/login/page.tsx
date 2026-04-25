@@ -37,9 +37,11 @@ function LoginForm() {
     });
     setLoading(false);
     if (res?.error) {
+      // Auth.js v5: custom CredentialsSignin codes come back via res.code.
+      const code = (res as unknown as { code?: string }).code;
       setError(
-        res.error === "EMAIL_NOT_VERIFIED"
-          ? "Verifica tu email antes de iniciar sesión"
+        code === "EMAIL_NOT_VERIFIED"
+          ? "Verifica tu email antes de iniciar sesión. Revisá tu bandeja de entrada."
           : "Credenciales inválidas"
       );
       return;
@@ -72,12 +74,7 @@ function LoginForm() {
       </div>
 
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Contraseña</Label>
-          <Link href="/forgot" className="text-xs text-primary hover:underline">
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </div>
+        <Label htmlFor="password">Contraseña</Label>
         <div className="relative">
           <Input
             id="password"
