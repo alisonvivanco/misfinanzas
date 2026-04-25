@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Shield, CheckCircle2, Clock, XCircle, Sparkles, Loader2 } from "lucide-react";
+import { DbHealthCard } from "./db-health-card";
 
 interface UserRow {
   _id: string;
@@ -84,6 +85,8 @@ export function AdminClient({ users }: { users: UserRow[] }) {
           className="h-9 rounded-xl border bg-card px-3 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-ring transition"
         />
       </motion.header>
+
+      <DbHealthCard />
 
       <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto scrollbar-thin">
