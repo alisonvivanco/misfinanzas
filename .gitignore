@@ -15,6 +15,7 @@ dist
 # envs
 .env*
 !.env.example
+.mongodb-creds
 
 # logs
 *.log
