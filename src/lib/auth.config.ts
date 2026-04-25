@@ -36,13 +36,7 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const PROTECTED = [
         "/dashboard",
-        "/boletas",
-        "/cotizaciones",
-        "/presupuesto",
-        "/deudas",
-        "/ahorros",
-        "/inversiones",
-        "/configuracion",
+        "/anual",
         "/completar-perfil",
       ];
       const isProtected = PROTECTED.some((p) => nextUrl.pathname.startsWith(p));
