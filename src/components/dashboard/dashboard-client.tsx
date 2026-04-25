@@ -184,13 +184,15 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
         <FixedExpensesTable items={data.recurring} onChange={load} />
       </div>
 
-      {/* Gastos Variables full width */}
-      <VariableExpensesTable items={data.expenses} mes={mes} anio={anio} onChange={load} />
-
-      {/* Ahorros + Deudas + Donaciones */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <SavingsTable items={data.savings} onChange={load} />
+      {/* Gastos Variables + Deudas */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <VariableExpensesTable items={data.expenses} mes={mes} anio={anio} onChange={load} />
         <DebtsTable items={data.debts} onChange={load} />
+      </div>
+
+      {/* Ahorros + Donaciones */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <SavingsTable items={data.savings} onChange={load} />
         <DonationsTable items={data.donations} mes={mes} anio={anio} onChange={load} />
       </div>
 
