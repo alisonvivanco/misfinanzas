@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { dbConnect } from "@/lib/mongodb";
 import { Income } from "@/models/Income";
 import { Expense } from "@/models/Expense";
@@ -16,17 +17,19 @@ export async function GET(req: NextRequest) {
   if (!anio) return bad("anio requerido");
 
   await dbConnect();
+  // aggregate's $match doesn't auto-cast strings to ObjectId — wrap explicitly.
+  const userObjectId = new mongoose.Types.ObjectId(u.userId);
   const [incomes, expenses, donations, recurring, savings, debts] = await Promise.all([
     Income.aggregate([
-      { $match: { userId: u.userId as any, anio } },
+      { $match: { userId: userObjectId, anio } },
       { $group: { _id: "$mes", total: { $sum: "$monto" } } },
     ]),
     Expense.aggregate([
-      { $match: { userId: u.userId as any, anio } },
+      { $match: { userId: userObjectId, anio } },
       { $group: { _id: "$mes", total: { $sum: "$monto" }, ahorros: { $sum: { $cond: [{ $eq: ["$tipo", "ahorros"] }, "$monto", 0] } } } },
     ]),
     Donation.aggregate([
-      { $match: { userId: u.userId as any, anio } },
+      { $match: { userId: userObjectId, anio } },
       { $group: { _id: "$mes", total: { $sum: "$monto" } } },
     ]),
     RecurringExpense.find({ userId: u.userId, activo: true }).select("monto").lean(),

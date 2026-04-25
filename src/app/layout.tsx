@@ -3,22 +3,22 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "MisFinanzas · Tu contador personal digital",
+    default: "MisFinanzas · Tu plata, bajo control",
     template: "%s · MisFinanzas",
   },
   description:
-    "Gestión financiera personal para Chile. Boletas, sueldo, cotizaciones, presupuesto 50/30/20, deudas, ahorros e inversiones. Hecho para chilenos.",
+    "El presupuesto personal que sí vas a usar. Anota ingresos, gastos, deudas y ahorros — calculamos solos cuánto te queda y cómo distribuirlo (regla 50/30/20).",
   keywords: [
-    "finanzas personales Chile",
-    "boletas honorarios",
-    "cotizaciones AFP",
-    "presupuesto 50/30/20",
-    "APV",
+    "presupuesto personal Chile",
+    "regla 50/30/20",
+    "control de gastos",
+    "ahorro personal",
+    "control de deudas",
   ],
   authors: [{ name: "Alison Vivanco" }],
   openGraph: {
     title: "MisFinanzas",
-    description: "Tu contador personal digital — diseñado para Chile.",
+    description: "Tu plata, bajo control — presupuesto personal simple para Chile.",
     type: "website",
     locale: "es_CL",
     url: "https://misfinanzas.alisonvivanco.cl",
