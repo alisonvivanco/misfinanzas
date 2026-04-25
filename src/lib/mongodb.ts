@@ -5,9 +5,10 @@
 import mongoose, { Connection } from "mongoose";
 import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) {
-  throw new Error("Falta MONGODB_URI en variables de entorno");
+function getUri(): string {
+  const u = process.env.MONGODB_URI;
+  if (!u) throw new Error("Falta MONGODB_URI en variables de entorno");
+  return u;
 }
 
 // ---------- Mongoose (para modelos) ----------
@@ -31,7 +32,7 @@ export async function dbConnect(): Promise<Connection> {
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI!, {
+      .connect(getUri(), {
         bufferCommands: false,
         dbName: process.env.MONGODB_DB || "misfinanzas",
       })
@@ -42,10 +43,18 @@ export async function dbConnect(): Promise<Connection> {
 }
 
 // ---------- MongoClient (para Auth.js adapter) ----------
-const clientPromise: Promise<MongoClient> =
-  global.mongoClientPromise ??
-  (global.mongoClientPromise = new MongoClient(MONGODB_URI, {
-    maxPoolSize: 10,
-  }).connect());
+function getClientPromise(): Promise<MongoClient> {
+  if (!global.mongoClientPromise) {
+    global.mongoClientPromise = new MongoClient(getUri(), { maxPoolSize: 10 }).connect();
+  }
+  return global.mongoClientPromise;
+}
+
+// Proxy thenable: only triggers connect when actually awaited.
+const clientPromise = {
+  then: (...args: Parameters<Promise<MongoClient>["then"]>) => getClientPromise().then(...args),
+  catch: (...args: Parameters<Promise<MongoClient>["catch"]>) => getClientPromise().catch(...args),
+  finally: (...args: Parameters<Promise<MongoClient>["finally"]>) => getClientPromise().finally(...args),
+} as Promise<MongoClient>;
 
 export default clientPromise;

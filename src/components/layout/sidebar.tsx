@@ -1,26 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  FileText,
-  Shield,
-  Wallet,
-  PiggyBank,
-  TrendingUp,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, CalendarDays, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 
 const NAV = [
-  { href: "/dashboard", label: "Inicio", Icon: LayoutDashboard },
-  { href: "/boletas", label: "Boletas", Icon: FileText },
-  { href: "/cotizaciones", label: "Cotizaciones", Icon: Shield },
-  { href: "/deudas", label: "Deudas", Icon: Wallet },
-  { href: "/ahorros", label: "Ahorros", Icon: PiggyBank },
-  { href: "/inversiones", label: "Inversiones", Icon: TrendingUp },
+  { href: "/dashboard", label: "Mes actual", Icon: LayoutDashboard },
+  { href: "/anual", label: "Resumen anual", Icon: CalendarDays },
 ];
 
 export function Sidebar({ user }: { user: { name?: string | null; email?: string | null } }) {
@@ -54,13 +41,6 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
         })}
       </nav>
       <div className="p-3 border-t space-y-1">
-        <Link
-          href="/configuracion"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition"
-        >
-          <Settings className="h-4 w-4" />
-          Configuración
-        </Link>
         <div className="px-3 py-3 rounded-lg bg-accent/50 space-y-1">
           <div className="text-xs font-medium truncate">{user.name}</div>
           <div className="text-xs text-muted-foreground truncate">{user.email}</div>
