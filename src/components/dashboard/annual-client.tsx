@@ -12,7 +12,8 @@ interface MonthRow {
   gastosVariables: number;
   donaciones: number;
   gastoTotal: number;
-  ahorros: number;
+  aportesAhorro: number;
+  pagosDeuda: number;
   balance: number;
 }
 
@@ -25,11 +26,12 @@ interface AnnualData {
     gastosVariables: number;
     donaciones: number;
     gastoTotal: number;
-    ahorros: number;
+    aportesAhorro: number;
+    pagosDeuda: number;
     balance: number;
   };
   ahorroAcumulado: number;
-  deudaPagada: number;
+  deudaPagadaLifetime: number;
 }
 
 export function AnnualClient({ initialAnio }: { initialAnio: number }) {
@@ -139,16 +141,16 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
               delay={0.1}
             />
             <Kpi
-              label="Aportado a metas"
-              value={data.totales.ahorros}
+              label="Aportes a ahorros"
+              value={data.totales.aportesAhorro}
               Icon={Sparkles}
               iconClass="bg-violet-500/10 text-violet-600 dark:text-violet-400"
               valueClass="text-violet-600 dark:text-violet-400"
               delay={0.15}
             />
             <Kpi
-              label="Deuda pagada"
-              value={data.deudaPagada}
+              label="Deuda pagada (año)"
+              value={data.totales.pagosDeuda}
               Icon={CreditCard}
               iconClass="bg-blue-500/10 text-blue-600 dark:text-blue-400"
               valueClass="text-blue-600 dark:text-blue-400"
@@ -198,6 +200,8 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
                   <Row label="Gastos variables" values={data.rows.map((r) => r.gastosVariables)} total={data.totales.gastosVariables} />
                   <Row label="Donaciones" values={data.rows.map((r) => r.donaciones)} total={data.totales.donaciones} />
                   <Row label="Gasto total" values={data.rows.map((r) => r.gastoTotal)} total={data.totales.gastoTotal} bold />
+                  <Row label="Aportes a ahorros" values={data.rows.map((r) => r.aportesAhorro)} total={data.totales.aportesAhorro} />
+                  <Row label="Pagos a deudas" values={data.rows.map((r) => r.pagosDeuda)} total={data.totales.pagosDeuda} />
                   <Row label="Balance mes" values={data.rows.map((r) => r.balance)} total={data.totales.balance} bold highlight balance />
                 </tbody>
               </table>
