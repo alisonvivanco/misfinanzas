@@ -90,7 +90,7 @@ export async function sendTrialReminderEmail(email: string, nombre: string, user
       title: "Tu prueba termina pronto",
       preheader: "Suscríbete y mantén todo lo que registraste",
       body: `
-        <p>Tu prueba gratis de MisFinanzas <strong>termina en menos de 12 horas</strong>. Para no perder lo que ya registraste, suscríbete por menos que un café al mes:</p>
+        <p>Tu prueba gratis de MisFinanzas <strong>termina dentro de las próximas 24 horas</strong>. Para no perder lo que ya registraste, suscríbete por menos que un café al mes:</p>
         ${ctaButton(sub, "Suscribirme con MercadoPago")}
         <p class="muted small">Tus datos quedan guardados — al volver, todo lo que registraste sigue ahí.</p>
         <p class="muted small">¿Tienes dudas? Responde este correo.</p>
