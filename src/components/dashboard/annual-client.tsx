@@ -160,7 +160,7 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
                   <Row label="Gastos variables" values={data.rows.map((r) => r.gastosVariables)} total={data.totales.gastosVariables} />
                   <Row label="Donaciones" values={data.rows.map((r) => r.donaciones)} total={data.totales.donaciones} />
                   <Row label="Gasto total" values={data.rows.map((r) => r.gastoTotal)} total={data.totales.gastoTotal} bold />
-                  <Row label="Aportes a ahorros" values={data.rows.map((r) => r.aportesAhorro)} total={data.totales.aportesAhorro} />
+                  <Row label="Ahorros" values={data.rows.map((r) => r.aportesAhorro)} total={data.totales.aportesAhorro} />
                   <Row label="Pagos a deudas" values={data.rows.map((r) => r.pagosDeuda)} total={data.totales.pagosDeuda} />
                   <Row label="Te queda" values={data.rows.map((r) => r.balance)} total={data.totales.balance} bold highlight balance />
                 </tbody>

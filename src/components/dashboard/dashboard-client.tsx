@@ -14,10 +14,13 @@ import { VariableExpensesTable } from "./variable-expenses-table";
 import { SavingsTable } from "./savings-table";
 import { DebtsTable } from "./debts-table";
 import { DonationsTable } from "./donations-table";
+import { UpsellModal } from "./upsell-modal";
 
 interface Props {
   initialMes: number;
   initialAnio: number;
+  userId: string;
+  upsellEligible: boolean;
 }
 
 const EMPTY: MonthData = {
@@ -35,11 +38,15 @@ const BUCKET_LABEL: Record<Bucket, string> = {
   ahorros: "Ahorros",
 };
 
-export function DashboardClient({ initialMes, initialAnio }: Props) {
+export function DashboardClient({
+  initialMes, initialAnio, userId, upsellEligible,
+}: Props) {
   const [mes, setMes] = useState(initialMes);
   const [anio, setAnio] = useState(initialAnio);
   const [data, setData] = useState<MonthData>(EMPTY);
   const [loading, setLoading] = useState(true);
+  const [upsellOpen, setUpsellOpen] = useState(false);
+  const [upsellSeen, setUpsellSeen] = useState(!upsellEligible);
 
   async function load() {
     setLoading(true);
@@ -85,6 +92,30 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mes, anio]);
+
+  // Upsell trigger: cuando cualquier sección llega a 5+ ítems y el user
+  // todavía no vio el modal.
+  useEffect(() => {
+    if (upsellSeen || upsellOpen) return;
+    const counts = [
+      data.incomes.length,
+      data.recurring.length,
+      data.expenses.length,
+      data.savings.length,
+      data.debts.length,
+      data.donations.length,
+    ];
+    if (counts.some((c) => c >= 5)) {
+      setUpsellOpen(true);
+    }
+  }, [data, upsellSeen, upsellOpen]);
+
+  async function handleUpsellClose() {
+    setUpsellOpen(false);
+    setUpsellSeen(true);
+    // Persist server-side; ignore failure (worst case shows again next session).
+    fetch("/api/me/dismiss-upsell", { method: "POST" }).catch(() => {});
+  }
 
   const totales = useMemo(() => {
     const ingreso = data.incomes.reduce((s, i) => s + i.monto, 0);
@@ -221,6 +252,8 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
         <BudgetBlock totales={totales} presupuesto={presupuesto} />
         <SummaryBlock totales={totales} />
       </div>
+
+      <UpsellModal open={upsellOpen} onClose={handleUpsellClose} userId={userId} />
     </div>
   );
 }
@@ -312,7 +345,7 @@ function SummaryBlock({
         <Row label="Gastos fijos" value={-totales.gastoFijo} />
         <Row label="Gastos variables" value={-totales.gastoVariable} />
         <Row label="Donaciones" value={-totales.donaciones} />
-        <Row label="Aportes a ahorros" value={-totales.aportesAhorro} />
+        <Row label="Ahorros" value={-totales.aportesAhorro} />
         <Row label="Pagos a deudas" value={-totales.pagosDeuda} />
         <div className="border-t pt-3 mt-3">
           <div className="flex items-center justify-between">

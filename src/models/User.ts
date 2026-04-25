@@ -25,6 +25,8 @@ export interface IUser extends Document {
   welcomeSentAt?: Date;
   /** Marca de tiempo del recordatorio de fin de prueba (evita reenviar). */
   trialReminderSentAt?: Date;
+  /** Marca de tiempo de cuando vio el modal de upsell (no volver a mostrar). */
+  upsellShownAt?: Date;
   configuracion: {
     monedaPreferida: string;
     donacionesBucket: "necesidades" | "deseos" | "ahorros";
@@ -67,6 +69,7 @@ const UserSchema = new Schema<IUser>(
     mpStatus: { type: String },
     welcomeSentAt: { type: Date },
     trialReminderSentAt: { type: Date },
+    upsellShownAt: { type: Date },
     configuracion: {
       monedaPreferida: { type: String, default: "CLP" },
       donacionesBucket: {
