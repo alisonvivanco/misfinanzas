@@ -11,6 +11,17 @@ export const SUBSCRIBE_URL =
 export const MANAGE_SUBSCRIPTION_URL =
   process.env.NEXT_PUBLIC_MANAGE_SUBSCRIPTION_URL || FALLBACK_MANAGE_URL;
 
+/**
+ * Subscribe URL with `external_reference=<userId>` so MercadoPago's webhook
+ * can tell us which user the subscription belongs to. Falls back to the
+ * plain URL if no userId.
+ */
+export function buildSubscribeUrl(userId?: string | null): string {
+  if (!userId) return SUBSCRIBE_URL;
+  const sep = SUBSCRIBE_URL.includes("?") ? "&" : "?";
+  return `${SUBSCRIBE_URL}${sep}external_reference=${encodeURIComponent(userId)}`;
+}
+
 export const TRIAL_DAYS = (() => {
   const n = Number(process.env.FREE_TRIAL_DAYS);
   return Number.isFinite(n) && n > 0 ? n : 1;

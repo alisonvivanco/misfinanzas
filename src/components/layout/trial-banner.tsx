@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { SUBSCRIBE_URL, MANAGE_SUBSCRIPTION_URL } from "@/lib/subscription";
+import { buildSubscribeUrl, MANAGE_SUBSCRIPTION_URL } from "@/lib/subscription";
 
 export function TrialBanner({
   kind = "trial",
   daysLeft,
   expiresAt,
+  userId,
 }: {
   kind?: "trial" | "paid";
   daysLeft: number;
   expiresAt: Date | null;
+  userId?: string;
 }) {
   const expira = expiresAt
     ? new Intl.DateTimeFormat("es-CL", { day: "2-digit", month: "long" }).format(new Date(expiresAt))
@@ -28,7 +30,7 @@ export function TrialBanner({
     ? "Tu prueba expira mañana"
     : `Tu prueba expira en ${daysLeft} días`;
 
-  const href = isPaid ? MANAGE_SUBSCRIPTION_URL : SUBSCRIBE_URL;
+  const href = isPaid ? MANAGE_SUBSCRIPTION_URL : buildSubscribeUrl(userId);
   const cta = isPaid ? "Gestionar" : "Suscribirme";
 
   return (

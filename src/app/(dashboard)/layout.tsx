@@ -61,6 +61,7 @@ export default async function DashboardLayout({
                 kind={status.kind === "paid" ? "paid" : "trial"}
                 daysLeft={status.daysLeft ?? 0}
                 expiresAt={status.expiresAt}
+                userId={session.user.id}
               />
             )}
             {children}

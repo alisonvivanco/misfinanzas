@@ -17,6 +17,10 @@ export interface IUser extends Document {
   plan: "trial" | "free" | "premium" | "pro";
   trialEndsAt?: Date;
   subscribedUntil?: Date;
+  /** MercadoPago preapproval ID (suscripción) — populated by webhook. */
+  mpPreapprovalId?: string;
+  /** MP preapproval status (authorized/paused/cancelled). */
+  mpStatus?: string;
   configuracion: {
     monedaPreferida: string;
     donacionesBucket: "necesidades" | "deseos" | "ahorros";
@@ -55,6 +59,8 @@ const UserSchema = new Schema<IUser>(
     },
     trialEndsAt: { type: Date },
     subscribedUntil: { type: Date },
+    mpPreapprovalId: { type: String, index: true, sparse: true },
+    mpStatus: { type: String },
     configuracion: {
       monedaPreferida: { type: String, default: "CLP" },
       donacionesBucket: {

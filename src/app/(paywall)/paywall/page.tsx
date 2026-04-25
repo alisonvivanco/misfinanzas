@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { getSubscriptionStatus, SUBSCRIBE_URL } from "@/lib/subscription";
+import { getSubscriptionStatus, buildSubscribeUrl } from "@/lib/subscription";
 import { isAdminEmail } from "@/lib/subscription-server";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Check, ArrowRight, Heart } from "lucide-react";
@@ -74,7 +74,7 @@ export default async function PaywallPage() {
             ))}
           </ul>
 
-          <Link href={SUBSCRIBE_URL} target="_blank" rel="noopener noreferrer">
+          <Link href={buildSubscribeUrl(session.user.id)} target="_blank" rel="noopener noreferrer">
             <Button variant="gradient" size="lg" className="w-full gap-2">
               Suscribirme con MercadoPago
               <ArrowRight className="h-4 w-4" />
