@@ -16,6 +16,7 @@ import clientPromise, { dbConnect } from "./mongodb";
 import { User } from "@/models/User";
 import { z } from "zod";
 import { authConfig } from "./auth.config";
+import { sendWelcomeEmail } from "./email";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -86,6 +87,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         }
       );
+
+      // OAuth users skip the email-verification step, so send the welcome
+      // here. Don't block sign-in on email failures.
+      if (user.email) {
+        sendWelcomeEmail(user.email, nombre)
+          .then(() =>
+            User.updateOne(
+              { _id: new ObjectId(user.id as string) },
+              { $set: { welcomeSentAt: new Date() } }
+            )
+          )
+          .catch((e) => console.error("[oauth-welcome]", e));
+      }
     },
   },
   callbacks: {
