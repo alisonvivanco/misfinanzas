@@ -25,7 +25,7 @@ const schema = z.object({
     .min(8, "Mínimo 8 caracteres")
     .regex(/[A-Z]/, "Al menos 1 mayúscula")
     .regex(/[0-9]/, "Al menos 1 número"),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio"]),
+  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]),
   acepta: z.literal(true, { errorMap: () => ({ message: "Debes aceptar los términos" }) }),
 });
 
@@ -188,6 +188,7 @@ export default function SignupPage() {
           <option value="dependiente">Sueldo (dependiente)</option>
           <option value="mixto">Mixto</option>
           <option value="negocio">Negocio / emprendimiento</option>
+          <option value="informal">Informal (sin boletas/facturas)</option>
         </select>
       </div>
 

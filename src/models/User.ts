@@ -13,7 +13,7 @@ export interface IUser extends Document {
   verificationTokenExpires?: Date;
   resetToken?: string;
   resetTokenExpires?: Date;
-  tipoIngreso?: "dependiente" | "honorarios" | "mixto" | "negocio";
+  tipoIngreso?: "dependiente" | "honorarios" | "mixto" | "negocio" | "informal";
   profileComplete: boolean;
   plan: "trial" | "free" | "premium" | "pro";
   trialEndsAt?: Date;
@@ -67,7 +67,7 @@ const UserSchema = new Schema<IUser>(
     resetTokenExpires: { type: Date, select: false },
     tipoIngreso: {
       type: String,
-      enum: ["dependiente", "honorarios", "mixto", "negocio"],
+      enum: ["dependiente", "honorarios", "mixto", "negocio", "informal"],
       default: "honorarios",
     },
     profileComplete: { type: Boolean, default: false, index: true },

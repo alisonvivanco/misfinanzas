@@ -22,7 +22,7 @@ const schema = z.object({
     .string()
     .refine((v) => !v || validarRut(v), { message: "RUT inválido" })
     .optional(),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio"]).optional(),
+  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]).optional(),
 
   // Tasas tributarias
   retencionHonorariosPct: pct.optional(),

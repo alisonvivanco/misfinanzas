@@ -18,7 +18,7 @@ const signupSchema = z.object({
     .min(8, "Mínimo 8 caracteres")
     .regex(/[A-Z]/, "Al menos 1 mayúscula")
     .regex(/[0-9]/, "Al menos 1 número"),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio"]).optional(),
+  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]).optional(),
 });
 
 export async function POST(req: NextRequest) {

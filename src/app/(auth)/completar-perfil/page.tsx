@@ -16,7 +16,7 @@ const schema = z.object({
   telefono: z
     .string()
     .regex(/^(\+?56)?\s?9?\s?\d{4}\s?\d{4}$/, "Formato: +56 9 1234 5678"),
-  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio"]),
+  tipoIngreso: z.enum(["dependiente", "honorarios", "mixto", "negocio", "informal"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -107,6 +107,7 @@ export default function CompletarPerfilPage() {
           <option value="dependiente">Sueldo (dependiente)</option>
           <option value="mixto">Mixto</option>
           <option value="negocio">Negocio / emprendimiento</option>
+          <option value="informal">Informal (sin boletas/facturas)</option>
         </select>
       </div>
 

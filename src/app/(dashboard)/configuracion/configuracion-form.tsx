@@ -143,6 +143,7 @@ function PerfilCard({
             <option value="dependiente">Sueldo dependiente</option>
             <option value="mixto">Mixto</option>
             <option value="negocio">Negocio / emprendimiento</option>
+            <option value="informal">Informal (sin boletas/facturas)</option>
           </select>
         </Field>
       </div>
