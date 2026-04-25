@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,15 +46,16 @@ export function MobileNav({
   return (
     <>
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between gap-2 px-4 h-14 border-b bg-background/85 backdrop-blur-xl">
+        <Link href="/dashboard" className="inline-flex">
+          <Logo size="sm" />
+        </Link>
         <button
           onClick={() => setOpen(true)}
-          className="p-2 -ml-2 rounded-lg hover:bg-accent transition"
+          className="p-2 -mr-2 rounded-lg hover:bg-accent transition"
           aria-label="Abrir menú"
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Logo size="sm" />
-        <div className="w-9" aria-hidden /> {/* spacer to balance the menu button */}
       </header>
 
       <AnimatePresence>

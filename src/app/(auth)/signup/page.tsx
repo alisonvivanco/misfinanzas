@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,9 @@ import { Label } from "@/components/ui/label";
 import { validarRut, formatearRut } from "@/lib/rut";
 import { Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { GoogleButton } from "@/components/auth/google-button";
+
+const REF_COOKIE = "mf_ref";
+const REF_TTL_DAYS = 30;
 
 const schema = z.object({
   nombre: z.string().min(2, "Muy corto"),
@@ -31,11 +34,38 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="text-center py-8"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>
+    }>
+      <SignupForm />
+    </Suspense>
+  );
+}
+
+function SignupForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Captura ref de la URL y persiste en cookie 30 días para que sobreviva
+  // a un signup con Google OAuth (la callback del OAuth no preserva query).
+  useEffect(() => {
+    const ref = params.get("ref");
+    if (ref && /^[A-Z0-9]{4,20}$/i.test(ref)) {
+      const exp = new Date(Date.now() + REF_TTL_DAYS * 86400_000).toUTCString();
+      document.cookie = `${REF_COOKIE}=${encodeURIComponent(ref)}; path=/; expires=${exp}; SameSite=Lax`;
+    }
+  }, [params]);
+
+  function readRefCookie(): string | null {
+    if (typeof document === "undefined") return null;
+    const m = document.cookie.match(new RegExp(`(?:^|; )${REF_COOKIE}=([^;]+)`));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
 
   const {
     register,
@@ -53,10 +83,11 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
     try {
+      const ref = params.get("ref") || readRefCookie() || undefined;
       const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, ref }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error al crear cuenta");
