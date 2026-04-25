@@ -23,7 +23,7 @@
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 221 83% 53%;
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Tokens financieros */
     --income: 152 72% 45%;
@@ -31,6 +31,11 @@
     --savings: 38 92% 55%;
     --investment: 271 70% 58%;
     --debt: 221 83% 53%;
+
+    /* 50/30/20 buckets */
+    --bucket-needs: 217 91% 60%;
+    --bucket-wants: 330 81% 60%;
+    --bucket-saves: 152 72% 45%;
   }
 
   .dark {
@@ -63,28 +68,85 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "ss01" 1;
   }
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
-  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
 }
 
 @layer components {
   .gradient-mesh {
-    background: radial-gradient(at 20% 10%, hsl(221 83% 53% / 0.08), transparent 50%),
-                radial-gradient(at 80% 20%, hsl(271 70% 58% / 0.08), transparent 50%),
-                radial-gradient(at 50% 90%, hsl(152 72% 45% / 0.08), transparent 50%);
+    background:
+      radial-gradient(at 20% 10%, hsl(221 83% 53% / 0.10), transparent 50%),
+      radial-gradient(at 80% 20%, hsl(271 70% 58% / 0.10), transparent 50%),
+      radial-gradient(at 50% 90%, hsl(152 72% 45% / 0.10), transparent 50%);
+  }
+  .gradient-mesh-soft {
+    background:
+      radial-gradient(at 0% 0%, hsl(221 83% 53% / 0.05), transparent 50%),
+      radial-gradient(at 100% 0%, hsl(330 81% 60% / 0.05), transparent 50%),
+      radial-gradient(at 100% 100%, hsl(152 72% 45% / 0.04), transparent 50%);
   }
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
   }
   .glass {
     @apply bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/5;
   }
+  .gradient-border {
+    position: relative;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, hsl(221 83% 53% / 0.3), hsl(271 70% 58% / 0.3), hsl(152 72% 45% / 0.3));
+  }
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(221 83% 53%), hsl(271 70% 58%), hsl(330 81% 60%));
+  }
+  .animated-bg {
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+  }
 }
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 999px;
+  }
+  .text-balance { text-wrap: balance; }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up { animation: fade-up 0.4s ease-out; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }

@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, PiggyBank } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
-import { TableShell, DeleteBtn } from "./table-shell";
+import { TableShell, DeleteBtn, Row } from "./table-shell";
 import { apiCall, parseMonto } from "./api-call";
 import type { Saving } from "./types";
 
@@ -27,7 +28,7 @@ export function SavingsTable({
     setLoading(false);
     if (ok) {
       setDescripcion(""); setMeta("");
-      toast.success("Meta agregada");
+      toast.success("Meta creada");
       onChange();
     }
   }
@@ -51,9 +52,15 @@ export function SavingsTable({
   return (
     <TableShell
       title="Ahorros"
+      Icon={PiggyBank}
+      iconClass="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
       total={formatCLP(total)}
-      headers={["Meta", "Objetivo", "Ahorrado", "Falta", ""]}
+      totalLabel="Ahorrado"
+      headers={["Meta", "Progreso", ""]}
       rowCount={items.length}
+      emptyEmoji="🎯"
+      emptyMsg="Sin metas de ahorro"
+      emptyHint="Vacaciones, emergencia, casa…"
       addRow={
         <div className="flex gap-2">
           <input
@@ -61,7 +68,7 @@ export function SavingsTable({
             onChange={(e) => setDescripcion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Ej: Vacaciones"
-            className="flex-1 h-8 rounded border bg-background px-2 text-sm"
+            className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <input
             value={meta}
@@ -69,37 +76,61 @@ export function SavingsTable({
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Meta"
             inputMode="numeric"
-            className="w-28 h-8 rounded border bg-background px-2 text-sm text-right"
+            className="w-28 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
-          <button
+          <motion.button
+            whileTap={{ scale: 0.96 }}
             onClick={add}
             disabled={loading}
-            className="h-8 px-3 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-medium hover:shadow-md hover:shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-1.5 transition-all"
           >
-            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Agregar
-          </button>
+          </motion.button>
         </div>
       }
     >
       {items.map((i) => {
-        const falta = Math.max(i.meta - i.montoAhorrado, 0);
+        const pct = i.meta > 0 ? Math.min(100, (i.montoAhorrado / i.meta) * 100) : 0;
+        const done = i.montoAhorrado >= i.meta && i.meta > 0;
         return (
-          <tr key={i._id} className="border-t">
-            <td className="px-3 py-2">{i.descripcion}</td>
-            <td className="px-3 py-2 text-right">{formatCLP(i.meta)}</td>
-            <td className="px-3 py-2 text-right">
-              <input
-                key={i.montoAhorrado}
-                defaultValue={i.montoAhorrado}
-                onBlur={(e) => updateAhorrado(i._id, e.target.value, i.montoAhorrado)}
-                inputMode="numeric"
-                className="w-24 h-7 rounded border bg-background px-2 text-sm text-right"
-              />
+          <Row key={i._id}>
+            <td className="px-4 py-3" colSpan={2}>
+              <div className="flex items-center justify-between gap-3 mb-1.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-medium truncate">{i.descripcion}</span>
+                  {done && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">¡Cumplida!</span>}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    key={i.montoAhorrado}
+                    defaultValue={i.montoAhorrado}
+                    onBlur={(e) => updateAhorrado(i._id, e.target.value, i.montoAhorrado)}
+                    inputMode="numeric"
+                    className="w-24 h-7 rounded-md border bg-background px-2 text-xs text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring transition"
+                  />
+                  <span className="text-xs text-muted-foreground tabular-nums">/ {formatCLP(i.meta)}</span>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600"
+                />
+              </div>
+              <div className="flex justify-between mt-1">
+                <span className="text-[10px] text-muted-foreground">{pct.toFixed(0)}%</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">
+                  {done ? "" : `Faltan ${formatCLP(Math.max(i.meta - i.montoAhorrado, 0))}`}
+                </span>
+              </div>
             </td>
-            <td className="px-3 py-2 text-right text-xs text-muted-foreground">{formatCLP(falta)}</td>
-            <td className="px-3 py-2 text-right"><DeleteBtn onClick={() => remove(i._id)} /></td>
-          </tr>
+            <td className="px-4 py-3 text-right align-top">
+              <DeleteBtn onClick={() => remove(i._id)} />
+            </td>
+          </Row>
         );
       })}
     </TableShell>
