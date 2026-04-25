@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Shield, CheckCircle2, Clock, XCircle, Sparkles, Loader2 } from "lucide-react";
 import { DbHealthCard } from "./db-health-card";
+import { MpWebhookCard } from "./mp-webhook-card";
 
 interface UserRow {
   _id: string;
@@ -86,7 +87,10 @@ export function AdminClient({ users }: { users: UserRow[] }) {
         />
       </motion.header>
 
-      <DbHealthCard />
+      <div className="grid lg:grid-cols-2 gap-4">
+        <DbHealthCard />
+        <MpWebhookCard />
+      </div>
 
       <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto scrollbar-thin">
