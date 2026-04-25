@@ -5,6 +5,7 @@ import { LayoutDashboard, CalendarDays, LogOut, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { Logo } from "@/components/brand/logo";
 
 const NAV = [
   { href: "/dashboard", label: "Mes actual", Icon: LayoutDashboard },
@@ -33,11 +34,8 @@ export function Sidebar({
   return (
     <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card/30 backdrop-blur-xl">
       <div className="p-6 border-b">
-        <Link href="/" className="flex items-baseline gap-1 group">
-          <span className="font-bold text-lg tracking-tight transition-transform group-hover:-translate-x-px">
-            AlisonVivanco
-          </span>
-          <span className="font-bold text-lg tracking-tight gradient-text">.cl</span>
+        <Link href="/" className="group">
+          <Logo size="md" />
         </Link>
       </div>
 

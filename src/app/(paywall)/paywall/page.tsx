@@ -7,6 +7,7 @@ import { getSubscriptionStatus, buildSubscribeUrl } from "@/lib/subscription";
 import { isAdminEmail } from "@/lib/subscription-server";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Check, ArrowRight, Heart } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 export default async function PaywallPage() {
   const session = await auth();
@@ -36,9 +37,8 @@ export default async function PaywallPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background gradient-mesh">
       <div className="w-full max-w-2xl space-y-6">
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex items-baseline gap-1 mb-4">
-            <span className="font-bold text-xl tracking-tight">AlisonVivanco</span>
-            <span className="font-bold text-xl tracking-tight gradient-text">.cl</span>
+          <Link href="/" className="inline-block mb-4">
+            <Logo size="lg" />
           </Link>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-card text-xs font-medium">
             <Sparkles className="h-3 w-3 text-amber-500" />
