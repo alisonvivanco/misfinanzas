@@ -1,14 +1,24 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
+export interface ISavingContribution {
+  _id?: Types.ObjectId;
+  fecha: Date;
+  monto: number;
+  notas?: string;
+  createdAt?: Date;
+}
+
 /**
- * Meta de ahorro (fila de "AHORROS" del Excel).
- * Tracking simple: meta + monto ahorrado actual.
+ * Meta de ahorro con historial de aportes.
+ * `montoAhorrado` es denormalizado (suma de contribuciones) — la API lo
+ * recalcula cada vez que se agrega o elimina un aporte.
  */
 export interface ISaving extends Document {
   userId: Types.ObjectId;
-  descripcion: string; // "Vacaciones", "Emergencia"
+  descripcion: string;
   meta: number;
   montoAhorrado: number;
+  contribuciones: ISavingContribution[];
   fechaMeta?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +30,14 @@ const SavingSchema = new Schema<ISaving>(
     descripcion: { type: String, required: true, trim: true },
     meta: { type: Number, required: true, min: 0 },
     montoAhorrado: { type: Number, default: 0, min: 0 },
+    contribuciones: [
+      {
+        fecha: { type: Date, required: true },
+        monto: { type: Number, required: true, min: 0 },
+        notas: { type: String, trim: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     fechaMeta: { type: Date },
   },
   { timestamps: true }

@@ -8,11 +8,15 @@ import { requireActiveUser, bad, badZod } from "@/lib/api-helpers";
 const createSchema = z.object({
   descripcion: z.string().min(1).max(120),
   monto: z.number().nonnegative(),
-  pagado: z.number().nonnegative().optional(),
+  cuotasTotales: z.number().int().min(1).max(360).optional(),
   fechaVencimiento: z.string().optional(),
 });
 
-const patchSchema = createSchema.partial().extend({
+const patchSchema = z.object({
+  descripcion: z.string().min(1).max(120).optional(),
+  monto: z.number().nonnegative().optional(),
+  cuotasTotales: z.number().int().min(1).max(360).nullable().optional(),
+  fechaVencimiento: z.string().optional(),
   saldada: z.boolean().optional(),
 });
 

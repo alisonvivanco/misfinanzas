@@ -8,11 +8,14 @@ import { requireActiveUser, bad, badZod } from "@/lib/api-helpers";
 const createSchema = z.object({
   descripcion: z.string().min(1).max(120),
   meta: z.number().nonnegative(),
-  montoAhorrado: z.number().nonnegative().optional(),
   fechaMeta: z.string().optional(),
 });
 
-const patchSchema = createSchema.partial();
+const patchSchema = z.object({
+  descripcion: z.string().min(1).max(120).optional(),
+  meta: z.number().nonnegative().optional(),
+  fechaMeta: z.string().optional(),
+});
 
 export async function GET(_req: NextRequest) {
   const u = await requireActiveUser();

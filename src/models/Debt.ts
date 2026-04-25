@@ -1,14 +1,25 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
+export interface IDebtPayment {
+  _id?: Types.ObjectId;
+  fecha: Date;
+  monto: number;
+  notas?: string;
+  createdAt?: Date;
+}
+
 /**
- * Deuda (fila de "PAGO DE DEUDA" del Excel).
- * Cuando `saldada` es true se renderiza con strikethrough en la UI.
+ * Deuda con historial de abonos.
+ * `pagado` es denormalizado (suma de pagos). La API lo recalcula al
+ * agregar/quitar un pago. Cuando alcanza `monto`, marca `saldada: true`.
  */
 export interface IDebt extends Document {
   userId: Types.ObjectId;
-  descripcion: string; // "Auto", "Celular nuevo"
-  monto: number; // monto total de la deuda
-  pagado: number; // monto ya pagado
+  descripcion: string;
+  monto: number;
+  pagado: number;
+  pagos: IDebtPayment[];
+  cuotasTotales?: number;
   fechaVencimiento?: Date;
   saldada: boolean;
   createdAt: Date;
@@ -21,6 +32,15 @@ const DebtSchema = new Schema<IDebt>(
     descripcion: { type: String, required: true, trim: true },
     monto: { type: Number, required: true, min: 0 },
     pagado: { type: Number, default: 0, min: 0 },
+    pagos: [
+      {
+        fecha: { type: Date, required: true },
+        monto: { type: Number, required: true, min: 0 },
+        notas: { type: String, trim: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    cuotasTotales: { type: Number, min: 1 },
     fechaVencimiento: { type: Date },
     saldada: { type: Boolean, default: false, index: true },
   },
