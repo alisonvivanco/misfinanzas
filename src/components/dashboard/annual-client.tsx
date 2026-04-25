@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, PiggyBank, CreditCard, Sparkles, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { MESES_ES_SHORT, formatCLP } from "@/lib/utils";
 import { AnimatedCLP } from "./animated-number";
@@ -115,9 +115,9 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
 
       {data && (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Kpi
-              label="Ingreso total"
+              label="Ingreso total del año"
               value={data.totales.ingreso}
               Icon={TrendingUp}
               iconClass="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
@@ -125,52 +125,12 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
               delay={0}
             />
             <Kpi
-              label="Gastos total"
+              label="Gastos del año"
               value={data.totales.gastoTotal}
               Icon={TrendingDown}
               iconClass="bg-rose-500/10 text-rose-600 dark:text-rose-400"
               valueClass="text-rose-600 dark:text-rose-400"
               delay={0.05}
-            />
-            <Kpi
-              label="Ahorro acumulado"
-              value={data.ahorroAcumulado}
-              Icon={PiggyBank}
-              iconClass="bg-amber-500/10 text-amber-600 dark:text-amber-400"
-              valueClass="text-amber-600 dark:text-amber-400"
-              delay={0.1}
-            />
-            <Kpi
-              label="Aportes a ahorros"
-              value={data.totales.aportesAhorro}
-              Icon={Sparkles}
-              iconClass="bg-violet-500/10 text-violet-600 dark:text-violet-400"
-              valueClass="text-violet-600 dark:text-violet-400"
-              delay={0.15}
-            />
-            <Kpi
-              label="Deuda pagada (año)"
-              value={data.totales.pagosDeuda}
-              Icon={CreditCard}
-              iconClass="bg-blue-500/10 text-blue-600 dark:text-blue-400"
-              valueClass="text-blue-600 dark:text-blue-400"
-              delay={0.2}
-            />
-            <Kpi
-              label="Balance"
-              value={data.totales.balance}
-              Icon={Wallet}
-              iconClass={
-                data.totales.balance >= 0
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-              }
-              valueClass={
-                data.totales.balance >= 0
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-rose-600 dark:text-rose-400"
-              }
-              delay={0.25}
             />
           </div>
 
@@ -202,7 +162,7 @@ export function AnnualClient({ initialAnio }: { initialAnio: number }) {
                   <Row label="Gasto total" values={data.rows.map((r) => r.gastoTotal)} total={data.totales.gastoTotal} bold />
                   <Row label="Aportes a ahorros" values={data.rows.map((r) => r.aportesAhorro)} total={data.totales.aportesAhorro} />
                   <Row label="Pagos a deudas" values={data.rows.map((r) => r.pagosDeuda)} total={data.totales.pagosDeuda} />
-                  <Row label="Balance mes" values={data.rows.map((r) => r.balance)} total={data.totales.balance} bold highlight balance />
+                  <Row label="Te queda" values={data.rows.map((r) => r.balance)} total={data.totales.balance} bold highlight balance />
                 </tbody>
               </table>
             </div>
@@ -268,15 +228,15 @@ function Kpi({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl border bg-card shadow-sm hover:shadow-md transition-shadow p-3.5 group"
+      className="rounded-2xl border bg-card shadow-sm hover:shadow-md transition-shadow p-5 group"
     >
-      <div className="flex items-start justify-between mb-1.5">
-        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
-        <div className={`h-6 w-6 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform ${iconClass}`}>
-          <Icon className="h-3 w-3" />
+      <div className="flex items-start justify-between mb-3">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+        <div className={`h-8 w-8 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${iconClass}`}>
+          <Icon className="h-4 w-4" />
         </div>
       </div>
-      <div className={"text-lg font-bold " + valueClass}>
+      <div className={"text-3xl font-bold tracking-tight " + valueClass}>
         <AnimatedCLP value={value} />
       </div>
     </motion.div>

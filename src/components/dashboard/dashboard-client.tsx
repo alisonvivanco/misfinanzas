@@ -92,14 +92,34 @@ export function DashboardClient({ initialMes, initialAnio }: Props) {
     const gastoVariable = data.expenses.reduce((s, e) => s + e.monto, 0);
     const donaciones = data.donations.reduce((s, d) => s + d.monto, 0);
     const gastoTotal = gastoFijo + gastoVariable + donaciones;
-    const restante = ingreso - gastoTotal;
+
+    // Aportes a ahorros y pagos a deudas registrados durante este mes
+    // (por fecha del aporte/pago, no de creación de la meta/deuda).
+    const inMonth = (d: string | undefined) => {
+      if (!d) return false;
+      const date = new Date(d);
+      return date.getUTCMonth() + 1 === mes && date.getUTCFullYear() === anio;
+    };
+    const aportesAhorro = data.savings
+      .flatMap((s) => s.contribuciones || [])
+      .filter((c) => inMonth(c.fecha))
+      .reduce((s, c) => s + c.monto, 0);
+    const pagosDeuda = data.debts
+      .flatMap((d) => d.pagos || [])
+      .filter((p) => inMonth(p.fecha))
+      .reduce((s, p) => s + p.monto, 0);
+
+    const restante = ingreso - gastoTotal - aportesAhorro - pagosDeuda;
 
     const buckets: Record<Bucket, number> = { necesidades: 0, deseos: 0, ahorros: 0 };
     for (const r of data.recurring) buckets[r.tipo] += r.monto;
     for (const e of data.expenses) buckets[e.tipo] += e.monto;
     for (const d of data.donations) buckets.deseos += d.monto;
 
-    return { ingreso, gastoFijo, gastoVariable, donaciones, gastoTotal, restante, buckets };
+    return {
+      ingreso, gastoFijo, gastoVariable, donaciones, gastoTotal,
+      aportesAhorro, pagosDeuda, restante, buckets,
+    };
   }, [data]);
 
   const presupuesto = useMemo(
@@ -272,6 +292,8 @@ function SummaryBlock({
     gastoFijo: number;
     gastoVariable: number;
     donaciones: number;
+    aportesAhorro: number;
+    pagosDeuda: number;
     restante: number;
   };
 }) {
@@ -290,6 +312,8 @@ function SummaryBlock({
         <Row label="Gastos fijos" value={-totales.gastoFijo} />
         <Row label="Gastos variables" value={-totales.gastoVariable} />
         <Row label="Donaciones" value={-totales.donaciones} />
+        <Row label="Aportes a ahorros" value={-totales.aportesAhorro} />
+        <Row label="Pagos a deudas" value={-totales.pagosDeuda} />
         <div className="border-t pt-3 mt-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">Te queda</span>
