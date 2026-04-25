@@ -12,16 +12,28 @@ const NAV = [
   { href: "/anual", label: "Resumen anual", Icon: CalendarDays },
 ];
 
-export function Sidebar({
+export interface SidebarUser {
+  name?: string | null;
+  email?: string | null;
+}
+
+/**
+ * Reusable inner contents of the sidebar — used by both the desktop static
+ * <Sidebar /> and the mobile drawer <MobileNav />.
+ */
+export function SidebarContent({
   user,
   isAdmin,
+  onNavigate,
+  layoutIdSuffix = "",
 }: {
-  user: { name?: string | null; email?: string | null };
+  user: SidebarUser;
   isAdmin?: boolean;
+  onNavigate?: () => void;
+  /** Distinguishes the active-pill layoutId between desktop and mobile. */
+  layoutIdSuffix?: string;
 }) {
-  const nav = isAdmin
-    ? [...NAV, { href: "/admin", label: "Admin", Icon: Shield }]
-    : NAV;
+  const nav = isAdmin ? [...NAV, { href: "/admin", label: "Admin", Icon: Shield }] : NAV;
   const pathname = usePathname();
   const initials = (user.name || user.email || "?")
     .split(/\s+/)
@@ -32,9 +44,9 @@ export function Sidebar({
     .toUpperCase();
 
   return (
-    <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card/30 backdrop-blur-xl">
+    <div className="flex flex-col h-full">
       <div className="p-6 border-b">
-        <Link href="/" className="group">
+        <Link href="/" className="group" onClick={onNavigate}>
           <Logo size="md" />
         </Link>
       </div>
@@ -43,10 +55,15 @@ export function Sidebar({
         {nav.map((item) => {
           const active = pathname.startsWith(item.href);
           return (
-            <Link key={item.href} href={item.href} className="relative block">
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className="relative block"
+            >
               {active && (
                 <motion.div
-                  layoutId="sidebar-active"
+                  layoutId={"sidebar-active" + layoutIdSuffix}
                   className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-violet-600 shadow-lg shadow-primary/20"
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
@@ -54,7 +71,9 @@ export function Sidebar({
               <div
                 className={cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-                  active ? "text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  active
+                    ? "text-white"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
                 <item.Icon className="h-4 w-4" />
@@ -83,6 +102,14 @@ export function Sidebar({
           Cerrar sesión
         </button>
       </div>
+    </div>
+  );
+}
+
+export function Sidebar({ user, isAdmin }: { user: SidebarUser; isAdmin?: boolean }) {
+  return (
+    <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card/30 backdrop-blur-xl">
+      <SidebarContent user={user} isAdmin={isAdmin} />
     </aside>
   );
 }

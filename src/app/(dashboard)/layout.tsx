@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import { dbConnect } from "@/lib/mongodb";
@@ -54,19 +55,25 @@ export default async function DashboardLayout({
           user={{ name: session.user.name, email: session.user.email }}
           isAdmin={isAdmin}
         />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container py-8 max-w-7xl space-y-4">
-            {showBanner && (
-              <TrialBanner
-                kind={status.kind === "paid" ? "paid" : "trial"}
-                daysLeft={status.daysLeft ?? 0}
-                expiresAt={status.expiresAt}
-                userId={session.user.id}
-              />
-            )}
-            {children}
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col min-w-0">
+          <MobileNav
+            user={{ name: session.user.name, email: session.user.email }}
+            isAdmin={isAdmin}
+          />
+          <main className="flex-1 overflow-y-auto">
+            <div className="container py-6 lg:py-8 max-w-7xl space-y-4">
+              {showBanner && (
+                <TrialBanner
+                  kind={status.kind === "paid" ? "paid" : "trial"}
+                  daysLeft={status.daysLeft ?? 0}
+                  expiresAt={status.expiresAt}
+                  userId={session.user.id}
+                />
+              )}
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
       <Toaster richColors closeButton position="top-right" theme="system" />
     </SessionProvider>
