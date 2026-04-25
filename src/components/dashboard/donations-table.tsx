@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn, Row } from "./table-shell";
-import { apiCall, parseMonto } from "./api-call";
+import { apiCall } from "./api-call";
+import { MoneyInput, parseMontoInput } from "./money-input";
 import type { Donation } from "./types";
 
 export function DonationsTable({
@@ -18,7 +19,7 @@ export function DonationsTable({
   const total = items.reduce((s, i) => s + i.monto, 0);
 
   async function add() {
-    const m = parseMonto(monto);
+    const m = parseMontoInput(monto);
     if (!descripcion.trim()) { toast.error("Falta la descripción"); return; }
     if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
@@ -60,12 +61,11 @@ export function DonationsTable({
             className="w-full h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <div className="flex gap-2">
-            <input
+            <MoneyInput
               value={monto}
-              onChange={(e) => setMonto(e.target.value)}
+              onValueChange={setMonto}
               onKeyDown={(e) => e.key === "Enter" && add()}
               placeholder="Monto"
-              inputMode="numeric"
               className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
             />
             <input

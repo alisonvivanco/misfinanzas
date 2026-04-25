@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn, Row } from "./table-shell";
-import { apiCall, parseMonto } from "./api-call";
+import { apiCall } from "./api-call";
+import { MoneyInput, parseMontoInput } from "./money-input";
 import type { Income } from "./types";
 
 export function IncomesTable({
@@ -17,7 +18,7 @@ export function IncomesTable({
   const total = items.reduce((s, i) => s + i.monto, 0);
 
   async function add() {
-    const m = parseMonto(monto);
+    const m = parseMontoInput(monto);
     if (!fuente.trim()) { toast.error("Falta la fuente"); return; }
     if (!m || m <= 0) { toast.error("Monto inválido"); return; }
     setLoading(true);
@@ -58,13 +59,12 @@ export function IncomesTable({
             placeholder="Fuente (ej: Trabajo)"
             className="flex-1 h-9 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
-          <input
+          <MoneyInput
             value={monto}
-            onChange={(e) => setMonto(e.target.value)}
+            onValueChange={setMonto}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Monto"
-            inputMode="numeric"
-            className="w-28 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
+            className="w-32 h-9 rounded-lg border bg-background px-3 text-sm text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
           <motion.button
             whileTap={{ scale: 0.96 }}

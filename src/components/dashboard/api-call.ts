@@ -37,6 +37,3 @@ export async function apiCall<T = unknown>(url: string, opts: ApiOptions = {}): 
   }
 }
 
-export function parseMonto(v: string): number {
-  return parseInt(v.replace(/\D/g, ""), 10);
-}

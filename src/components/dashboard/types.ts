@@ -27,12 +27,27 @@ export interface Recurring {
   activo: boolean;
 }
 
+export interface SavingContribution {
+  _id: string;
+  fecha: string;
+  monto: number;
+  notas?: string;
+}
+
 export interface Saving {
   _id: string;
   descripcion: string;
   meta: number;
   montoAhorrado: number;
+  contribuciones: SavingContribution[];
   fechaMeta?: string;
+}
+
+export interface DebtPayment {
+  _id: string;
+  fecha: string;
+  monto: number;
+  notas?: string;
 }
 
 export interface Debt {
@@ -40,6 +55,8 @@ export interface Debt {
   descripcion: string;
   monto: number;
   pagado: number;
+  pagos: DebtPayment[];
+  cuotasTotales?: number;
   fechaVencimiento?: string;
   saldada: boolean;
 }
