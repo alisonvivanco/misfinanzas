@@ -3,6 +3,12 @@
   "devCommand": "next dev",
   "framework": "nextjs",
   "regions": ["gru1"],
+  "crons": [
+    {
+      "path": "/api/cron/trial-reminder",
+      "schedule": "0 12 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

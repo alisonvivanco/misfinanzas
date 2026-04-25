@@ -24,6 +24,8 @@ const GATE_BYPASS_PREFIXES = [
   "/api/auth",
   // Server-to-server webhooks (MercadoPago, etc.) — never go through the gate.
   "/api/webhooks",
+  // Cron jobs (Vercel) — invocados internamente, sin cookie de gate.
+  "/api/cron",
 ];
 
 export default auth(async (req) => {

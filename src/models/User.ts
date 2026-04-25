@@ -21,6 +21,10 @@ export interface IUser extends Document {
   mpPreapprovalId?: string;
   /** MP preapproval status (authorized/paused/cancelled). */
   mpStatus?: string;
+  /** Marca de tiempo del email de bienvenida (evita reenviar). */
+  welcomeSentAt?: Date;
+  /** Marca de tiempo del recordatorio de fin de prueba (evita reenviar). */
+  trialReminderSentAt?: Date;
   configuracion: {
     monedaPreferida: string;
     donacionesBucket: "necesidades" | "deseos" | "ahorros";
@@ -61,6 +65,8 @@ const UserSchema = new Schema<IUser>(
     subscribedUntil: { type: Date },
     mpPreapprovalId: { type: String, index: true, sparse: true },
     mpStatus: { type: String },
+    welcomeSentAt: { type: Date },
+    trialReminderSentAt: { type: Date },
     configuracion: {
       monedaPreferida: { type: String, default: "CLP" },
       donacionesBucket: {
