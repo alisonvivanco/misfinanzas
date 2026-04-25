@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
@@ -27,6 +27,12 @@ export interface IUser extends Document {
   trialReminderSentAt?: Date;
   /** Marca de tiempo de cuando vio el modal de upsell (no volver a mostrar). */
   upsellShownAt?: Date;
+  /** Código de referido único (8 chars). Se usa en /signup?ref=CODE. */
+  referralCode?: string;
+  /** _id del User que refirió a este. Se setea en signup si vino con ref. */
+  referredBy?: Types.ObjectId;
+  /** Marca cuando se le otorgó el bonus al referrer (evita duplicar grants). */
+  referralBonusGrantedAt?: Date;
   configuracion: {
     monedaPreferida: string;
     donacionesBucket: "necesidades" | "deseos" | "ahorros";
@@ -70,6 +76,9 @@ const UserSchema = new Schema<IUser>(
     welcomeSentAt: { type: Date },
     trialReminderSentAt: { type: Date },
     upsellShownAt: { type: Date },
+    referralCode: { type: String, index: true, sparse: true, unique: true },
+    referredBy: { type: Schema.Types.ObjectId, ref: "User", index: true, sparse: true },
+    referralBonusGrantedAt: { type: Date },
     configuracion: {
       monedaPreferida: { type: String, default: "CLP" },
       donacionesBucket: {

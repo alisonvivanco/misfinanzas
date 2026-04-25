@@ -1,11 +1,13 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, CalendarDays, LogOut, Shield, Gift } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import { Logo } from "@/components/brand/logo";
+import { ShareModal } from "@/components/share/share-modal";
 
 const NAV = [
   { href: "/dashboard", label: "Mes actual", Icon: LayoutDashboard },
@@ -35,6 +37,7 @@ export function SidebarContent({
 }) {
   const nav = isAdmin ? [...NAV, { href: "/admin", label: "Admin", Icon: Shield }] : NAV;
   const pathname = usePathname();
+  const [shareOpen, setShareOpen] = useState(false);
   const initials = (user.name || user.email || "?")
     .split(/\s+/)
     .map((s) => s[0])
@@ -46,7 +49,7 @@ export function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
-        <Link href="/" className="group" onClick={onNavigate}>
+        <Link href="/dashboard" className="group" onClick={onNavigate}>
           <Logo size="md" />
         </Link>
       </div>
@@ -82,6 +85,18 @@ export function SidebarContent({
             </Link>
           );
         })}
+
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            setShareOpen(true);
+          }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/15 hover:to-teal-500/15 transition mt-1"
+        >
+          <Gift className="h-4 w-4" />
+          Comparte y gana 💸
+        </button>
       </nav>
 
       <div className="p-3 border-t space-y-2">
@@ -102,6 +117,8 @@ export function SidebarContent({
           Cerrar sesión
         </button>
       </div>
+
+      <ShareModal open={shareOpen} onClose={() => setShareOpen(false)} />
     </div>
   );
 }

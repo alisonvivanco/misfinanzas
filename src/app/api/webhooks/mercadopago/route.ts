@@ -123,7 +123,42 @@ async function handlePreapproval(preapprovalId: string, token: string) {
     // expires; the layout's getSubscriptionStatus() does the active check.
   }
 
-  await User.findOneAndUpdate(userQuery, { $set: update }, { new: true }).lean();
+  const updatedUser = await User.findOneAndUpdate(userQuery, { $set: update }, { new: true }).lean();
+
+  // Si el user pagó (authorized) Y vino con un referido Y todavía no se le
+  // otorgó el bonus al referrer → otorgarle 30 días al referrer y marcar
+  // referralBonusGrantedAt para evitar duplicar en webhooks repetidos.
+  if (
+    updatedUser &&
+    pre.status === "authorized" &&
+    updatedUser.referredBy &&
+    !updatedUser.referralBonusGrantedAt
+  ) {
+    try {
+      const referrer = await User.findById(updatedUser.referredBy)
+        .select("subscribedUntil plan")
+        .lean();
+      if (referrer) {
+        const base = referrer.subscribedUntil && new Date(referrer.subscribedUntil) > new Date()
+          ? new Date(referrer.subscribedUntil)
+          : new Date();
+        const newUntil = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000);
+        await User.updateOne(
+          { _id: referrer._id },
+          { $set: { subscribedUntil: newUntil, plan: "premium" } }
+        );
+        await User.updateOne(
+          { _id: updatedUser._id },
+          { $set: { referralBonusGrantedAt: new Date() } }
+        );
+        console.log(
+          `[mp-webhook] referral bonus +30d para ${referrer._id} (referido ${updatedUser._id} pagó)`
+        );
+      }
+    } catch (e) {
+      console.error("[mp-webhook] error otorgando referral bonus", e);
+    }
+  }
 }
 
 interface MpAuthorizedPayment {

@@ -75,6 +75,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const nombre = parts[0] || "";
       const apellido = parts.slice(1).join(" ") || "";
       const trialDays = Number(process.env.FREE_TRIAL_DAYS || 1);
+
+      // Si el usuario llegó por un link de referido, captura el código desde
+      // la cookie `mf_ref` (seteada por /signup?ref=...) y resuelve a User._id.
+      let referredBy: ObjectId | undefined;
+      try {
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        const refCode = cookieStore.get("mf_ref")?.value;
+        if (refCode) {
+          const ref = await User.findOne({ referralCode: refCode })
+            .select("_id")
+            .lean();
+          if (ref?._id) referredBy = ref._id as ObjectId;
+        }
+      } catch {
+        // Silent: cookie module no disponible o ref inválido — proceguir sin ref.
+      }
+
       await User.updateOne(
         { _id: new ObjectId(user.id as string) },
         {
@@ -84,6 +102,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             profileComplete: false,
             plan: "trial",
             trialEndsAt: new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000),
+            ...(referredBy ? { referredBy } : {}),
           },
         }
       );

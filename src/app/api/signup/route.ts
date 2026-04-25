@@ -18,6 +18,7 @@ const signupSchema = z.object({
     .min(8, "Mínimo 8 caracteres")
     .regex(/[A-Z]/, "Al menos 1 mayúscula")
     .regex(/[0-9]/, "Al menos 1 número"),
+  ref: z.string().min(4).max(20).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -52,8 +53,19 @@ export async function POST(req: NextRequest) {
       Date.now() + Number(process.env.FREE_TRIAL_DAYS || 1) * 24 * 60 * 60 * 1000
     );
 
+    // Buscar al referrer si vino con ?ref=CODE
+    let referredBy: typeof User.prototype._id | undefined;
+    if (data.ref) {
+      const referrer = await User.findOne({ referralCode: data.ref })
+        .select("_id")
+        .lean();
+      if (referrer) referredBy = referrer._id;
+    }
+
+    const { ref: _ref, ...rest } = data;
+    void _ref;
     const user = await User.create({
-      ...data,
+      ...rest,
       rut: rutNormalizado,
       password: hashedPassword,
       verificationToken,
@@ -62,6 +74,7 @@ export async function POST(req: NextRequest) {
       plan: "trial",
       trialEndsAt: trialEnds,
       profileComplete: true,
+      ...(referredBy ? { referredBy } : {}),
     });
 
     await sendVerificationEmail(user.email, user.nombre || "", verificationToken);
