@@ -106,7 +106,8 @@ export async function GET(req: NextRequest) {
       gastoTotal,
       aportesAhorro: aportes,
       pagosDeuda,
-      balance: ingreso - gastoTotal,
+      // "Te queda" — todos los outflows del mes (gastos + aportes + pagos a deuda).
+      balance: ingreso - gastoTotal - aportes - pagosDeuda,
     };
   });
 
