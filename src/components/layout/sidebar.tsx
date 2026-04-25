@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   FileText,
   Shield,
-  PieChart,
   Wallet,
   PiggyBank,
   TrendingUp,
@@ -16,10 +15,9 @@ import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
+  { href: "/dashboard", label: "Inicio", Icon: LayoutDashboard },
   { href: "/boletas", label: "Boletas", Icon: FileText },
   { href: "/cotizaciones", label: "Cotizaciones", Icon: Shield },
-  { href: "/presupuesto", label: "Presupuesto", Icon: PieChart },
   { href: "/deudas", label: "Deudas", Icon: Wallet },
   { href: "/ahorros", label: "Ahorros", Icon: PiggyBank },
   { href: "/inversiones", label: "Inversiones", Icon: TrendingUp },

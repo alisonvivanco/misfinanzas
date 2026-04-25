@@ -18,11 +18,9 @@ import {
   TrendingUp,
   PiggyBank,
   FileText,
-  PieChart as PieIcon,
   CreditCard,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -185,9 +183,6 @@ export default async function DashboardPage() {
               <h3 className="font-semibold">Presupuesto vs Actual</h3>
               <p className="text-xs text-muted-foreground">{MESES_CORTOS[mes - 1]} {anio}</p>
             </div>
-            <Link href="/presupuesto">
-              <Button variant="ghost" size="sm">Ver presupuesto</Button>
-            </Link>
           </div>
           <BarComparativa data={presupuestoData} />
         </div>
@@ -197,9 +192,9 @@ export default async function DashboardPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { href: "/boletas/nueva", label: "Nueva boleta", Icon: FileText, tone: "from-emerald-500" },
-          { href: "/presupuesto", label: "Ver presupuesto", Icon: PieIcon, tone: "from-violet-500" },
-          { href: "/deudas/nueva", label: "Agregar deuda", Icon: CreditCard, tone: "from-blue-500" },
-          { href: "/ahorros/nueva", label: "Nueva meta", Icon: PiggyBank, tone: "from-amber-500" },
+          { href: "/inversiones", label: "Inversiones", Icon: TrendingUp, tone: "from-violet-500" },
+          { href: "/deudas", label: "Deudas", Icon: CreditCard, tone: "from-blue-500" },
+          { href: "/ahorros", label: "Metas de ahorro", Icon: PiggyBank, tone: "from-amber-500" },
         ].map((a) => (
           <Link
             key={a.href}

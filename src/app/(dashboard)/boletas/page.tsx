@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { Boleta } from "@/models/Boleta";
 import { Button } from "@/components/ui/button";
-import { formatCLP, formatPct, tasaRetencionHonorarios, provisionOperacionRenta } from "@/lib/chile-tax";
+import { formatCLP, formatPct, tasaRetencionHonorarios, provisionImpuestoAnual } from "@/lib/chile-tax";
 import { getUTMActual } from "@/lib/uf";
 import { FileText, Plus, TrendingUp, AlertCircle } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default async function BoletasPage() {
   const totalBruto = boletasAnio.reduce((s, b) => s + b.montoBruto, 0);
   const totalRetencion = boletasAnio.reduce((s, b) => s + b.montoRetencion, 0);
   const totalLiquido = boletasAnio.reduce((s, b) => s + b.montoLiquido, 0);
-  const { provisionRecomendada, impuestoEstimado } = provisionOperacionRenta(
+  const { provisionRecomendada, impuestoEstimado } = provisionImpuestoAnual(
     totalBruto,
     valorUTM,
     0
@@ -72,7 +72,7 @@ export default async function BoletasPage() {
           tone="default"
         />
         <KPICard
-          label="Provisión Op. Renta"
+          label="Provisión impuesto anual"
           value={provisionRecomendada}
           icon={AlertCircle}
           tone="expense"
@@ -95,7 +95,7 @@ export default async function BoletasPage() {
             <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <h3 className="font-medium mb-1">Aún no hay boletas</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Emite tu primera boleta para empezar a provisionar tu Operación Renta.
+              Emite tu primera boleta para empezar a provisionar tu impuesto anual.
             </p>
             <Link href="/boletas/nueva">
               <Button variant="gradient">Emitir mi primera boleta</Button>

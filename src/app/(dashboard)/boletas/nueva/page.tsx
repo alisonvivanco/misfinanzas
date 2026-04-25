@@ -208,7 +208,7 @@ export default function NuevaBoletaPage() {
           <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-4 text-xs text-amber-900 dark:text-amber-200">
             <div className="font-medium mb-1">💡 Sobre la retención</div>
             <p className="leading-relaxed">
-              La retención se provisiona para tu Operación Renta.
+              La retención se provisiona para tu impuesto anual.
               Recuerda: las cotizaciones previsionales se calculan sobre el 80%
               del bruto (Ley 21.133) y se pagan mensualmente en Previred.
             </p>

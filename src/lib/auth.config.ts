@@ -5,6 +5,7 @@
  */
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 
 export const authConfig = {
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
@@ -24,6 +25,11 @@ export const authConfig = {
         return null;
       },
     }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
@@ -37,27 +43,40 @@ export const authConfig = {
         "/ahorros",
         "/inversiones",
         "/configuracion",
+        "/completar-perfil",
       ];
       const isProtected = PROTECTED.some((p) => nextUrl.pathname.startsWith(p));
       if (isProtected && !isLoggedIn) return false;
       if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/signup")) {
-        return Response.redirect(new URL("/dashboard", nextUrl));
+        const target = auth?.user?.profileComplete === false ? "/completar-perfil" : "/dashboard";
+        return Response.redirect(new URL(target, nextUrl));
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.rut = (user as { rut?: string }).rut;
         token.plan = (user as { plan?: string }).plan;
+        token.profileComplete = (user as { profileComplete?: boolean }).profileComplete;
+      }
+      // Allow client-side `useSession().update({...})` after profile completion
+      // without forcing the user to sign out and back in.
+      if (trigger === "update" && session) {
+        if (typeof session.profileComplete === "boolean") {
+          token.profileComplete = session.profileComplete;
+        }
+        if (typeof session.rut === "string") token.rut = session.rut;
+        if (typeof session.plan === "string") token.plan = session.plan;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        (session.user as { rut?: string }).rut = token.rut as string;
-        (session.user as { plan?: string }).plan = token.plan as string;
+        session.user.rut = token.rut as string | undefined;
+        session.user.plan = token.plan as string | undefined;
+        session.user.profileComplete = token.profileComplete as boolean | undefined;
       }
       return session;
     },

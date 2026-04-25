@@ -81,7 +81,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Visita `http://localhost:3000` — el signup crea una cuenta con 14 días de trial.
+Visita `http://localhost:3000` — el signup crea una cuenta con 1 día de trial.
 
 ---
 
@@ -135,7 +135,7 @@ Registro con cálculo automático de retención según año (Ley 21.133):
 - 2027: 17%
 - 2028+: 17%
 
-Provisión automática para Operación Renta.
+Provisión automática para tu impuesto anual.
 
 ### 🛡 Cotizaciones Previsionales
 Cálculo mensual sobre base imponible del 80% del bruto (Ley 21.133):
@@ -173,14 +173,6 @@ Ordena deudas de menor a mayor saldo. Paga mínimo en todas + extra en la más p
 - **Ley 19.768** — APV (Ahorro Previsional Voluntario)
 - **DL 824 / LIR** — Impuesto a la Renta
 - **Tramos IU 2da Categoría** — Actualizar en `src/lib/chile-tax.ts` con valores SII
-
-### Integración futura con SII vía Clave Única
-
-Roadmap:
-- OAuth con Clave Única del Estado
-- Sync automático de boletas emitidas
-- Propuesta pre-llenada de Operación Renta
-- Descarga de certificados de retención
 
 ---
 

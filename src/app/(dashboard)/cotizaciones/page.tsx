@@ -85,7 +85,7 @@ export default async function CotizacionesPage() {
         <div className="p-5 border-b">
           <h3 className="font-semibold">Detalle mensual {anio}</h3>
           <p className="text-xs text-muted-foreground">
-            Pagar mensualmente en previred.com o al Operación Renta
+            Pagar mensualmente en previred.com
           </p>
         </div>
         <div className="overflow-x-auto">
