@@ -1,4 +1,5 @@
-// MercadoPago subscription endpoints + status helpers.
+// Pure subscription helpers — safe for both server and client.
+// Server-only utilities (admin email check) live in `subscription-server.ts`.
 
 const FALLBACK_SUBSCRIBE_URL =
   "https://www.mercadopago.cl/subscriptions/checkout?preapproval_plan_id=50b7a4d225194f30a3a03b1e4c09bea9";
@@ -10,11 +11,17 @@ export const SUBSCRIBE_URL =
 export const MANAGE_SUBSCRIPTION_URL =
   process.env.NEXT_PUBLIC_MANAGE_SUBSCRIPTION_URL || FALLBACK_MANAGE_URL;
 
+export const TRIAL_DAYS = (() => {
+  const n = Number(process.env.FREE_TRIAL_DAYS);
+  return Number.isFinite(n) && n > 0 ? n : 1;
+})();
+
 export interface SubscriptionInput {
-  email?: string | null;
   plan?: "trial" | "free" | "premium" | "pro";
   trialEndsAt?: Date | string | null;
   subscribedUntil?: Date | string | null;
+  /** Set by callers via `isAdminEmail` (server-only). */
+  isAdmin?: boolean;
 }
 
 export type SubscriptionKind = "trial" | "free" | "paid" | "expired";
@@ -26,31 +33,17 @@ export interface SubscriptionStatus {
   expiresAt: Date | null;
 }
 
-/** Server-only — reads ADMIN_EMAILS from env. Don't call from client bundles. */
-export function isAdminEmail(email?: string | null): boolean {
-  if (!email) return false;
-  const raw = process.env.ADMIN_EMAILS || "";
-  const list = raw
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  return list.includes(email.toLowerCase());
-}
-
 function toDate(d: Date | string | null | undefined): Date | null {
   if (!d) return null;
   return d instanceof Date ? d : new Date(d);
 }
 
-/** Returns the subscription state for a user. Pure — caller injects current time. */
+/** Pure, isomorphic. Caller decides admin status. */
 export function getSubscriptionStatus(
   user: SubscriptionInput,
   now: Date = new Date()
 ): SubscriptionStatus {
-  if (isAdminEmail(user.email)) {
-    return { active: true, kind: "free", daysLeft: null, expiresAt: null };
-  }
-  if (user.plan === "free") {
+  if (user.isAdmin || user.plan === "free") {
     return { active: true, kind: "free", daysLeft: null, expiresAt: null };
   }
   const trialEndsAt = toDate(user.trialEndsAt);
@@ -63,6 +56,12 @@ export function getSubscriptionStatus(
       daysLeft: Math.ceil((subUntil.getTime() - now.getTime()) / 86400000),
       expiresAt: subUntil,
     };
+  }
+  // Premium/Pro plan with no subscribedUntil yet (e.g. webhook race) — treat as
+  // active rather than locking the user out. Webhook is expected to set both
+  // fields atomically, but we err on the user's side here.
+  if ((user.plan === "premium" || user.plan === "pro") && !subUntil) {
+    return { active: true, kind: "paid", daysLeft: null, expiresAt: null };
   }
   if (user.plan === "trial" && trialEndsAt && trialEndsAt.getTime() > now.getTime()) {
     return {

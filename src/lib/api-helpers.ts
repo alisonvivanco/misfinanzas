@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { getSubscriptionStatus } from "@/lib/subscription";
+import { isAdminEmail } from "@/lib/subscription-server";
 
 export async function requireUser() {
   const session = await auth();
@@ -29,10 +30,10 @@ export async function requireActiveUser() {
     return { error: NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 }) };
   }
   const status = getSubscriptionStatus({
-    email: dbUser.email,
     plan: dbUser.plan,
     trialEndsAt: dbUser.trialEndsAt,
     subscribedUntil: dbUser.subscribedUntil,
+    isAdmin: isAdminEmail(dbUser.email),
   });
   if (!status.active) {
     return {
