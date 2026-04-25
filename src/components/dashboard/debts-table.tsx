@@ -7,6 +7,7 @@ import { formatCLP } from "@/lib/utils";
 import { TableShell, DeleteBtn, Row } from "./table-shell";
 import { apiCall } from "./api-call";
 import { MoneyInput, parseMontoInput } from "./money-input";
+import { CuotasGrid } from "./cuotas-grid";
 import type { Debt } from "./types";
 
 export function DebtsTable({
@@ -136,7 +137,23 @@ function DebtRow({
   onToggleSaldada: () => void;
 }) {
   const cls = i.saldada ? "line-through text-muted-foreground" : "";
-  const cuotasPagadas = i.pagos?.length ?? 0;
+
+  // Compute "cuotas pagadas" = number of cuotas whose accumulated payments
+  // cover their expected portion (or are explicitly skipped → still counted as
+  // "resolved" so progress reflects user's intent). Falls back to 0 when no
+  // cuotasTotales is configured.
+  let cuotasPagadas = 0;
+  if (i.cuotasTotales) {
+    const expectedBase = Math.round(i.monto / i.cuotasTotales);
+    const skipped = new Set(i.cuotasSaltadas ?? []);
+    for (let n = 1; n <= i.cuotasTotales; n++) {
+      const esperado = n === i.cuotasTotales
+        ? Math.max(0, i.monto - expectedBase * (i.cuotasTotales - 1))
+        : expectedBase;
+      const pagado = (i.pagos ?? []).filter((p) => p.cuotaNumero === n).reduce((s, p) => s + p.monto, 0);
+      if (skipped.has(n) || pagado >= esperado) cuotasPagadas++;
+    }
+  }
   return (
     <>
       <Row>
@@ -208,6 +225,8 @@ function PaymentsPanel({ debt, onChange }: { debt: Debt; onChange: () => void })
   const [notas, setNotas] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const hasCuotas = !!debt.cuotasTotales;
+
   async function add() {
     const m = parseMontoInput(monto);
     if (!m || m <= 0) { toast.error("Monto inválido"); return; }
@@ -240,9 +259,11 @@ function PaymentsPanel({ debt, onChange }: { debt: Debt; onChange: () => void })
   );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
+      {hasCuotas && <CuotasGrid debt={debt} onChange={onChange} />}
+
       <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-        Registrar abono
+        {hasCuotas ? "Abono general (sin asignar a cuota)" : "Registrar abono"}
       </div>
       <div className="flex flex-wrap gap-2">
         <MoneyInput
@@ -279,7 +300,7 @@ function PaymentsPanel({ debt, onChange }: { debt: Debt; onChange: () => void })
         </motion.button>
       </div>
 
-      {sorted.length > 0 && (
+      {!hasCuotas && sorted.length > 0 && (
         <>
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-1">
             Historial de abonos ({sorted.length})

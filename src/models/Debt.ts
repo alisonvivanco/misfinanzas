@@ -4,6 +4,8 @@ export interface IDebtPayment {
   _id?: Types.ObjectId;
   fecha: Date;
   monto: number;
+  /** 1-based cuota number this payment is targeted at. Optional. */
+  cuotaNumero?: number;
   notas?: string;
   createdAt?: Date;
 }
@@ -20,6 +22,8 @@ export interface IDebt extends Document {
   pagado: number;
   pagos: IDebtPayment[];
   cuotasTotales?: number;
+  /** 1-based cuota numbers explicitly marked as not paid / skipped. */
+  cuotasSaltadas: number[];
   fechaVencimiento?: Date;
   saldada: boolean;
   createdAt: Date;
@@ -36,11 +40,13 @@ const DebtSchema = new Schema<IDebt>(
       {
         fecha: { type: Date, required: true },
         monto: { type: Number, required: true, min: 0 },
+        cuotaNumero: { type: Number, min: 1 },
         notas: { type: String, trim: true },
         createdAt: { type: Date, default: Date.now },
       },
     ],
     cuotasTotales: { type: Number, min: 1 },
+    cuotasSaltadas: { type: [Number], default: [] },
     fechaVencimiento: { type: Date },
     saldada: { type: Boolean, default: false, index: true },
   },

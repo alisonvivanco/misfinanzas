@@ -47,6 +47,7 @@ export interface DebtPayment {
   _id: string;
   fecha: string;
   monto: number;
+  cuotaNumero?: number;
   notas?: string;
 }
 
@@ -57,6 +58,7 @@ export interface Debt {
   pagado: number;
   pagos: DebtPayment[];
   cuotasTotales?: number;
+  cuotasSaltadas?: number[];
   fechaVencimiento?: string;
   saldada: boolean;
 }
