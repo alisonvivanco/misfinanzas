@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, LogOut, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -11,7 +11,16 @@ const NAV = [
   { href: "/anual", label: "Resumen anual", Icon: CalendarDays },
 ];
 
-export function Sidebar({ user }: { user: { name?: string | null; email?: string | null } }) {
+export function Sidebar({
+  user,
+  isAdmin,
+}: {
+  user: { name?: string | null; email?: string | null };
+  isAdmin?: boolean;
+}) {
+  const nav = isAdmin
+    ? [...NAV, { href: "/admin", label: "Admin", Icon: Shield }]
+    : NAV;
   const pathname = usePathname();
   const initials = (user.name || user.email || "?")
     .split(/\s+/)
@@ -33,7 +42,7 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link key={item.href} href={item.href} className="relative block">

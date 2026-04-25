@@ -7,10 +7,10 @@ import { Donation } from "@/models/Donation";
 import { RecurringExpense } from "@/models/RecurringExpense";
 import { Saving } from "@/models/Saving";
 import { Debt } from "@/models/Debt";
-import { requireUser, bad } from "@/lib/api-helpers";
+import { requireActiveUser, bad } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  const u = await requireUser();
+  const u = await requireActiveUser();
   if ("error" in u) return u.error;
   const { searchParams } = new URL(req.url);
   const anio = Number(searchParams.get("anio"));

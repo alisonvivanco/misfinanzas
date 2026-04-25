@@ -37,6 +37,8 @@ export const authConfig = {
       const PROTECTED = [
         "/dashboard",
         "/anual",
+        "/admin",
+        "/paywall",
         "/completar-perfil",
       ];
       const isProtected = PROTECTED.some((p) => nextUrl.pathname.startsWith(p));
