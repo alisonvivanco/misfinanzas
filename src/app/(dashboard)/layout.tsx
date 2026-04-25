@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "sonner";
 
 export default async function DashboardLayout({
   children,
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
           <div className="container py-8 max-w-7xl">{children}</div>
         </main>
       </div>
+      <Toaster richColors closeButton position="top-right" />
     </SessionProvider>
   );
 }

@@ -26,6 +26,15 @@ export interface IUser extends Document {
     porcentajeSalud: number;
     valorUF?: number;
     valorUTM?: number;
+    // 50/30/20 — bucket donde caen las donaciones (default: deseos).
+    donacionesBucket: "necesidades" | "deseos" | "ahorros";
+    // Override por categoría del mapeo 50/30/20 (default vive en lib/categorias.ts).
+    categoriasOverride?: Record<string, "necesidades" | "deseos" | "ahorros">;
+    // Tope imponible mensual para cotizaciones independientes (UF, ajusta SII).
+    topeImponibleUF: number;
+    // Cotizaciones obligatorias adicionales (Ley 21.133).
+    sisPorcentaje: number; // SIS — Seguro Invalidez y Sobrevivencia
+    accTrabajoPorcentaje: number; // Mutual / Accidentes del Trabajo
   };
   stats: {
     totalBoletas: number;
@@ -78,6 +87,15 @@ const UserSchema = new Schema<IUser>(
       porcentajeSalud: { type: Number, default: 0.07 },
       valorUF: { type: Number },
       valorUTM: { type: Number },
+      donacionesBucket: {
+        type: String,
+        enum: ["necesidades", "deseos", "ahorros"],
+        default: "deseos",
+      },
+      categoriasOverride: { type: Schema.Types.Mixed, default: {} },
+      topeImponibleUF: { type: Number, default: 87.8 },
+      sisPorcentaje: { type: Number, default: 0.0154 },
+      accTrabajoPorcentaje: { type: Number, default: 0.0095 },
     },
     stats: {
       totalBoletas: { type: Number, default: 0 },
