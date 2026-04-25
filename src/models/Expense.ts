@@ -8,7 +8,8 @@ export type Bucket503020 = "necesidades" | "deseos" | "ahorros";
  */
 export interface IExpense extends Document {
   userId: Types.ObjectId;
-  categoria: string; // "Mercado", "Transporte", etc.
+  categoria: string; // "Mercado", "Transporte", o cualquier custom
+  descripcion?: string; // Detalle opcional, ej: "Salida con amigos"
   monto: number;
   tipo: Bucket503020;
   fecha?: Date;
@@ -22,6 +23,7 @@ const ExpenseSchema = new Schema<IExpense>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     categoria: { type: String, required: true, trim: true },
+    descripcion: { type: String, trim: true, maxlength: 200 },
     monto: { type: Number, required: true, min: 0 },
     tipo: {
       type: String,
